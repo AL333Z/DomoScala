@@ -2,7 +2,7 @@ package controllers
 
 import actors.DeviceActor
 import actors.DeviceActor.On
-import akka.actor.{PoisonPill, Props}
+import akka.actor.{ PoisonPill, Props }
 import play.api._
 import play.api.libs.concurrent.Akka
 import play.api.mvc._
@@ -17,7 +17,6 @@ object Application extends Controller {
     myActor ! PoisonPill
 
     Ok(views.html.index("Your new application is ready."))
-
   }
 
 }
