@@ -9,6 +9,7 @@ object ServoActor {
 
 class ServoActor(name: String) extends DeviceActor(name) {
   def receive = {
+//    case MoveServo => sender ! Ok
     case _ => sender ! UnsupportedAction
   }
 }
