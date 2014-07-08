@@ -21,40 +21,40 @@ class DevicesSpec(_system: ActorSystem) extends TestKit(_system)
 
   override def afterAll: Unit = system.shutdown()
 
+  def expectUnsupportedAction(actor: TestProbe) = {
+    actor.expectMsg(5 seconds, UnsupportedAction)
+  }
+
   "A Bulb" should "respond properly only to On/Off/SetActivationValue" in {
 
     val testProbe = TestProbe()
     val bulbProbe = system.actorOf(BulbActor.props("bulb1"))
 
-    testProbe.send(bulbProbe, On)
-    testProbe.expectMsg(5.second, Ok)
+    def expectAnyValidBulbMsg = {
+      testProbe.expectMsgAnyOf(5.second, Ok, Failed(new Throwable("A")), SetActivationValue)
+    }
 
-    testProbe.send(bulbProbe, Off)
-    testProbe.expectMsg(5.second, Ok)
+    def sendValidActionAndExpectValidBulbMsg(msg: AnyRef) = {
+      testProbe.send(bulbProbe, msg)
+      expectAnyValidBulbMsg
+    }
 
-    testProbe.send(bulbProbe, SetActivationValue(0.5))
-    testProbe.expectMsg(5.second, Ok)
+    def sendUnsupportedMsgAndExpectUnsupportedAction(msg: AnyRef) = {
+      testProbe.send(bulbProbe, msg)
+      expectUnsupportedAction(testProbe)
+    }
 
-    testProbe.send(bulbProbe, GetLightValue)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
+    sendValidActionAndExpectValidBulbMsg(On)
+    sendValidActionAndExpectValidBulbMsg(Off)
+    sendValidActionAndExpectValidBulbMsg(SetActivationValue(0.5))
 
-    testProbe.send(bulbProbe, GetTemperature)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
-
-    testProbe.send(bulbProbe, MoveServo)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
-
-    testProbe.send(bulbProbe, PlayBeep)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
-
-    testProbe.send(bulbProbe, GetSoundValue)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
-
-    testProbe.send(bulbProbe, GetSwitchState)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
-
-    testProbe.send(bulbProbe, Click)
-    testProbe.expectMsg(5 seconds, UnsupportedAction)
+    sendUnsupportedMsgAndExpectUnsupportedAction(GetLightValue)
+    sendUnsupportedMsgAndExpectUnsupportedAction(GetTemperature)
+    sendUnsupportedMsgAndExpectUnsupportedAction(MoveServo)
+    sendUnsupportedMsgAndExpectUnsupportedAction(PlayBeep)
+    sendUnsupportedMsgAndExpectUnsupportedAction(GetSoundValue)
+    sendUnsupportedMsgAndExpectUnsupportedAction(GetSwitchState)
+    sendUnsupportedMsgAndExpectUnsupportedAction(Click)
   }
 
 }

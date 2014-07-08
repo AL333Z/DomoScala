@@ -9,8 +9,9 @@ object BulbActor {
 
 class BulbActor(name: String) extends DeviceActor(name) {
   def receive = {
+    //TODO replace with some great behavior ;)
     case On => sender ! Ok
-    case Off => sender ! Ok
+    case Off => sender ! Failed(new Throwable("A"))
     case SetActivationValue(value) => sender ! Ok
     case _ => sender ! UnsupportedAction
   }

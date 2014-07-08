@@ -8,20 +8,44 @@ object DeviceActor {
   class SetActivation(value: Double)
   case object On extends SetActivation(1)
   case object Off extends SetActivation(0)
-  case class SetActivationValue(value: Double) extends SetActivation(value)
+  case class SetActivationValue(value: Double) extends SetActivation(value) {
+    override def equals(obj: Any) = {
+      this.value == obj.asInstanceOf[SetActivationValue].value
+    }
+  }
 
   case object GetLightValue
-  case class LightValue(lux: Double)
+  case class LightValue(lux: Double) {
+    override def equals(obj: Any) = {
+      this.lux == obj.asInstanceOf[LightValue].lux
+    }
+  }
 
   case object GetTemperature
-  case class Temperature(celsiusTemp: Double)
+  case class Temperature(celsiusTemp: Double) {
+    override def equals(obj: Any) = {
+      this.celsiusTemp == obj.asInstanceOf[Temperature].celsiusTemp
+    }
+  }
 
-  case class MoveServo(degrees: Double)
+  case class MoveServo(degrees: Double) {
+    override def equals(obj: Any) = {
+      this.degrees == obj.asInstanceOf[MoveServo].degrees
+    }
+  }
 
-  case class PlayBeep(duration: Duration)
+  case class PlayBeep(duration: Duration) {
+    override def equals(obj: Any) = {
+      this.duration == obj.asInstanceOf[PlayBeep].duration
+    }
+  }
 
   object GetSoundValue
-  case class SoundValue(decibels: Double)
+  case class SoundValue(decibels: Double) {
+    override def equals(obj: Any) = {
+      this.decibels == obj.asInstanceOf[SoundValue].decibels
+    }
+  }
 
   case object GetSwitchState
 
@@ -29,7 +53,12 @@ object DeviceActor {
 
   case object UnsupportedAction
   case object Ok
-  case class Failed(error: Throwable)
+  case class Failed(error: Throwable) {
+    override def equals(obj: Any) = {
+      val that = obj.asInstanceOf[Failed]
+      this.error.getMessage == that.error.getMessage
+    }
+  }
 }
 
 abstract class DeviceActor(name: String) extends Actor with ActorLogging
