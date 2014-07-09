@@ -1,4 +1,4 @@
-name := """play-scala"""
+name := "DomoScala"
 
 version := "1.0-SNAPSHOT"
 
