@@ -1,6 +1,6 @@
 package controllers
 
-import actors.DeviceActor
+import actors.{MeshnetToDeviceMessage, MeshnetBase, DeviceActor}
 import actors.DeviceActor.On
 import akka.actor.{ PoisonPill, Props }
 import play.api._
@@ -12,9 +12,8 @@ object Application extends Controller {
 
   def index = Action {
 
-    val myActor = Akka.system.actorOf(Props[DeviceActor], name = "mydevice")
-    myActor ! On
-    myActor ! PoisonPill
+    val act = Akka.system.actorOf(Props[MeshnetBase], name = "meshnetbase")
+    act ! MeshnetToDeviceMessage(123, 1, Array(1.toByte))
 
     Ok(views.html.index("Your new application is ready."))
   }
