@@ -87,40 +87,6 @@ class DevicesSpec(_system: ActorSystem) extends TestKit(_system)
     sendUnsupportedMsgAndExpectUnsupportedAction(GetSoundValue)
   }
 
-  "A LedActor" should "respond properly only to On/Off/SetActivationValue" in {
-
-    val testProbe = TestProbe()
-    val led = system.actorOf(LedActor.props("led1"))
-
-    def expectAnyValidLedMsg = {
-      testProbe.expectMsgAnyClassOf(5.second, classOf[Failed], Ok.getClass)
-    }
-
-    def sendValidActionAndExpectValidLedMsg(msg: AnyRef) = {
-      testProbe.send(led, msg)
-      expectAnyValidLedMsg
-    }
-
-    def sendUnsupportedMsgAndExpectUnsupportedAction(msg: AnyRef) = {
-      testProbe.send(led, msg)
-      expectUnsupportedAction(testProbe)
-    }
-
-    sendValidActionAndExpectValidLedMsg(On)
-    sendValidActionAndExpectValidLedMsg(Off)
-    sendValidActionAndExpectValidLedMsg(SetActivationValue(0.5))
-
-    testProbe.send(led, SetActivationValue(1.5))
-    testProbe.expectMsgAnyClassOf(5.second, classOf[Failed])
-
-    sendUnsupportedMsgAndExpectUnsupportedAction(Click)
-    sendUnsupportedMsgAndExpectUnsupportedAction(GetLightValue)
-    sendUnsupportedMsgAndExpectUnsupportedAction(GetTemperature)
-    sendUnsupportedMsgAndExpectUnsupportedAction(MoveServo)
-    sendUnsupportedMsgAndExpectUnsupportedAction(PlayBeep)
-    sendUnsupportedMsgAndExpectUnsupportedAction(GetSoundValue)
-  }
-
   "A LightSensorActor" should "respond properly only to GetLightValue" in {
 
     val testProbe = TestProbe()

@@ -7,7 +7,6 @@ import play.libs.Akka
 import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 
-
 /**
  * This actor represent a MeshNet base, something capable of running a JVM (for example a Raspberry Pi)
  * that act as a coordinator of (a part of) a MeshNet network.
