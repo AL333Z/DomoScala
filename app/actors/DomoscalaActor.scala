@@ -9,6 +9,10 @@ import actors.DeviceActor._
 class Room(val id: String, val devices: Map[String, ActorRef])
 class Building(val id: String, val rooms: Set[Room])
 
+/**
+ * Companion object of DomoscalaActor, that contains the messages used to query
+ * the system
+ */
 object DomoscalaActor {
   case class GetRooms(buildingId: String)
   case class GetDevices(buildingId: String, roomId: String)
@@ -16,14 +20,24 @@ object DomoscalaActor {
   case class SetDevicesStatus(buildingId: String, roomId: String, deviceId: String)
 }
 
+/**
+ * This actor wraps the structure of the system.
+ * It contains a `Set` of `Building`. This set can be also dynamically changed.
+ * The structure of the system is returned only via message-passing.
+ */
 class DomoscalaActor extends Actor with ActorLogging {
 
   def receive = init
 
   def init: Receive = {
-    // initializing from sample data
-    case _ => {
+    case Some(meshnetActorRef) => {
+      //TODO take some configuration from somewhere (DB, json file, ...)
 
+      log.info("Time to do some serious implementation :)")
+
+    }
+    case None => {
+      // we are just simultating stuff, create some demo actors
       val bulbActor0 = context.actorOf(BulbActor.props("Bulb0"))
       val bulbActor1 = context.actorOf(BulbActor.props("Bulb1"))
       val bulbActor2 = context.actorOf(BulbActor.props("Bulb2"))
@@ -43,13 +57,17 @@ class DomoscalaActor extends Actor with ActorLogging {
 
       val building = new Building("Building0", Set(room0, room1, room2))
 
-      context.become(main(Set(building)))
+      log.info("All demo actors created, starting main behavior..")
+
+      context.become(main(Set(building), None))
     }
   }
 
-  def main(buildings: Set[Building]): Receive = {
-    case GetRooms(buildingId) => getRooms(buildings, buildingId, sender)
-    case GetDevices(buildingId, roomId) => getDevices(buildings, buildingId, roomId, sender)
+  def main(buildings: Set[Building], meshnetActorRef: Option[ActorRef]): Receive = {
+    case GetRooms(buildingId) =>
+      getRooms(buildings, buildingId, sender).map(set => sender ! set)
+    case GetDevices(buildingId, roomId) =>
+      getDevices(buildings, buildingId, roomId, sender).map(set => sender ! set)
 
     //TODO implementation
     case GetDeviceStatus(buildingId, roomId, deviceId) =>
@@ -65,6 +83,7 @@ class DomoscalaActor extends Actor with ActorLogging {
       }
 
     case _ => sender ! UnsupportedAction
+    //TODO implement dynamic add-in of building/room/devices
   }
 
   /*
