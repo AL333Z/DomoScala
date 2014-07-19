@@ -17,6 +17,7 @@ import actors.DomoscalaActor._
 import play.api.libs.concurrent.Promise
 import akka.actor.ActorRef
 import actors.DeviceActor._
+import play.api.libs.json._
 
 object Application extends Controller {
 
@@ -29,11 +30,25 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready." + domo.pathString))
   }
 
+  def getBuildings = Action.async {
+    val timeoutFuture = getTimeoutFuture
+    val buildingsFuture = getBuildingFuture
+    Future.firstCompletedOf(Seq(buildingsFuture, timeoutFuture)).map {
+      case res: Set[_] => Ok(Json.obj(
+        "status" -> "OK",
+        "buildings" -> res.asInstanceOf[Set[Building]]))
+      case Failed(err) => BadRequest(err.getMessage())
+      case t: String => InternalServerError(t)
+    }
+  }
+
   def getRooms(buildingId: String) = Action.async {
     val timeoutFuture = getTimeoutFuture
     val roomsFuture = getRoomsFuture(buildingId)
     Future.firstCompletedOf(Seq(roomsFuture, timeoutFuture)).map {
-      case res: Set[_] => Ok(res.toString)
+      case res: Set[_] => Ok(Json.obj(
+        "status" -> "OK",
+        "rooms" -> res.asInstanceOf[Set[Room]]))
       case Failed(err) => BadRequest(err.getMessage())
       case t: String => InternalServerError(t)
     }
@@ -43,7 +58,11 @@ object Application extends Controller {
     val timeoutFuture = getTimeoutFuture
     val devicesFuture = getDevicesFuture(buildingId, roomId)
     Future.firstCompletedOf(Seq(devicesFuture, timeoutFuture)).map {
-      case res: Map[_, _] => Ok(res.toString)
+      case res: Map[_, _] => Ok(Json.obj(
+        "status" -> "OK",
+        "devices" -> res.asInstanceOf[Map[String, ActorRef]].map {
+          case (id, actor) => (id, actor.path.toString)
+        }))
       case Failed(err) => BadRequest(err.getMessage())
       case t: String => InternalServerError(t)
     }
@@ -57,6 +76,9 @@ object Application extends Controller {
    * Utilities, to get futures
    */
   def getTimeoutFuture = Promise.timeout("Timeout elapsed.", 5.second)
+
+  def getBuildingFuture: Future[Set[Building]] =
+    (domo ? GetBuildings).asInstanceOf[Future[Set[Building]]]
 
   def getRoomsFuture(buildingId: String): Future[Set[Room]] =
     (domo ? GetRooms(buildingId)).asInstanceOf[Future[Set[Room]]]

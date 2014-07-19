@@ -12,6 +12,7 @@
 
 # API
 
+GET   /buildings                       controllers.Application.getBuildings
 GET   /:buildingId/rooms               controllers.Application.getRooms(buildingId: String)
 GET   /:buildingId/:roomId/devices     controllers.Application.getDevices(buildingId: String, roomId: String)
 GET   /:buildingId/:roomId/:deviceId   controllers.Application.getDeviceStatus(buildingId: String, roomId: String, deviceId: String)
