@@ -30,6 +30,14 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready." + domo.pathString))
   }
 
+  def reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String) =
+    WebSocket.acceptWithActor[String, String] { request =>
+      out => {     
+    	Logger.debug("Push req received from request: " + request.toString)
+        DeviceStatusWebSocketActor.props(out, buildingId, roomId, deviceId)
+      }
+    }
+
   def getBuildings = Action.async {
     val timeoutFuture = getTimeoutFuture
     val buildingsFuture = getBuildingFuture

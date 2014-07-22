@@ -11,9 +11,9 @@ import actors.DomoscalaActor
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
-    Logger.info("*************************************************************")
-    Logger.info("******************Application has started.*******************")
-    Logger.info("*************************************************************")
+    Logger.info("**********************************************************")
+    Logger.info("******************Application has started.****************")
+    Logger.info("**********************************************************")
 
     Logger.info("Initializing Meshnet...")
 
@@ -33,9 +33,9 @@ object Global extends GlobalSettings {
   }
 
   override def onStop(app: Application) {
-    Logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    Logger.info("+++++++++++++++++Application shutdown...+++++++++++++++++++++")
-    Logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    Logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    Logger.info("+++++++++++++++++Application shutdown...++++++++++++++++++")
+    Logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   }
 
 }

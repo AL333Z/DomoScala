@@ -6,12 +6,13 @@ import akka.actor.ActorRef
 import actors.DomoscalaActor._
 import actors.DeviceActor._
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
 case class Room(val id: String, val devices: Map[String, ActorRef])
-
 object Room extends ((String, Map[String, ActorRef]) => Room) {
-  import play.api.libs.json._
-  import play.api.libs.functional.syntax._
 
+  // implicit Json serializer
   implicit val RoomToJson: Writes[Room] = (
     (__ \ "id").write[String] ~ (__ \ "devices").write[Map[String, String]]) {
       (room: Room) =>
@@ -21,11 +22,9 @@ object Room extends ((String, Map[String, ActorRef]) => Room) {
 }
 
 case class Building(val id: String, val rooms: Set[Room])
-
 object Building extends ((String, Set[Room]) => Building) {
-  import play.api.libs.json._
-  import play.api.libs.functional.syntax._
 
+  // implicit Json serializer
   implicit val BuildingToJson: Writes[Building] = (
     (__ \ "id").write[String] ~ (__ \ "rooms").write[Set[Room]]) {
       (building: Building) => (building.id, building.rooms)
@@ -40,6 +39,7 @@ object DomoscalaActor {
   object GetBuildings
   case class GetRooms(buildingId: String)
   case class GetDevices(buildingId: String, roomId: String)
+  case class GetDevice(buildingId: String, roomId: String, deviceId: String)
   case class GetDeviceStatus(buildingId: String, roomId: String, deviceId: String)
   case class SetDevicesStatus(buildingId: String, roomId: String, deviceId: String)
 }
@@ -95,6 +95,13 @@ class DomoscalaActor extends Actor with ActorLogging {
       getRooms(buildings, buildingId, sender).map(set => sender ! set)
     case GetDevices(buildingId, roomId) =>
       getDevices(buildings, buildingId, roomId, sender).map(set => sender ! set)
+
+    case GetDevice(buildingId, roomId, deviceId) =>
+      getDevice(buildings, buildingId, roomId, deviceId, sender) match {
+        case Some(devActorRef) =>
+          sender ! devActorRef
+        case None =>
+      }
 
     //TODO implementation
     case GetDeviceStatus(buildingId, roomId, deviceId) =>

@@ -5,9 +5,12 @@ import scala.concurrent.duration.Duration
 import akka.actor.Props
 
 object DeviceActor {
+
+  abstract class DeviceStatus(val pathName: String)
+
   class SetActivation(value: Double)
-  case object On extends SetActivation(1)
-  case object Off extends SetActivation(0)
+  case object On extends SetActivation(1.0)
+  case object Off extends SetActivation(0.0)
   case class SetActivationValue(value: Double) extends SetActivation(value) {
     override def equals(obj: Any) = {
       this.value == obj.asInstanceOf[SetActivationValue].value
@@ -15,14 +18,14 @@ object DeviceActor {
   }
 
   case object GetLightValue
-  case class LightValue(lux: Double) {
+  case class LightValue(lux: Double, override val pathName: String) extends DeviceStatus(pathName) {
     override def equals(obj: Any) = {
       this.lux == obj.asInstanceOf[LightValue].lux
     }
   }
 
   case object GetTemperature
-  case class Temperature(celsiusTemp: Double) {
+  case class Temperature(celsiusTemp: Double, override val pathName: String) extends DeviceStatus(pathName) {
     override def equals(obj: Any) = {
       this.celsiusTemp == obj.asInstanceOf[Temperature].celsiusTemp
     }
@@ -41,7 +44,7 @@ object DeviceActor {
   }
 
   object GetSoundValue
-  case class SoundValue(decibels: Double) {
+  case class SoundValue(decibels: Double, override val pathName: String) extends DeviceStatus(pathName) {
     override def equals(obj: Any) = {
       this.decibels == obj.asInstanceOf[SoundValue].decibels
     }
