@@ -1,4 +1,4 @@
-package actors
+package actors.device
 
 import actors.DeviceActor._
 import akka.actor.Props
@@ -8,6 +8,8 @@ import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
 import akka.actor.ActorLogging
 import scala.util.Random
+import actors.DeviceActor
+import akka.actor.actorRef2Scala
 
 object LightSensorActor {
   def props(name: String): Props = Props(classOf[LightSensorActor], name)
@@ -16,7 +18,7 @@ object LightSensorActor {
 class LightSensorActor(name: String) extends DeviceActor(name) with ActorLogging {
 
   //TODO publish values from a hot observable :), not from a scheduler...
-  Akka.system.scheduler.schedule(1000 milliseconds, 2000 milliseconds) {
+  Akka.system.scheduler.schedule(1000 milliseconds, 10000 milliseconds) {
     println("Gonna pubblish new value..")
     Akka.system.eventStream.publish(LightValue(Random.nextFloat, self.path.name))
   }

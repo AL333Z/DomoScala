@@ -5,10 +5,9 @@ import akka.actor.Actor
 import akka.actor.ActorRef
 import actors.DomoscalaActor._
 import actors.DeviceActor._
-
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-
+import actors.device._
 case class Room(val id: String, val devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
 
@@ -94,7 +93,7 @@ class DomoscalaActor extends Actor with ActorLogging {
     case GetRooms(buildingId) =>
       getRooms(buildings, buildingId, sender).map(set => sender ! set)
     case GetDevices(buildingId, roomId) =>
-      getDevices(buildings, buildingId, roomId, sender).map(set => sender ! set)
+      getDevices(buildings, buildingId, roomId, sender).map(m => sender ! m)
 
     case GetDevice(buildingId, roomId, deviceId) =>
       getDevice(buildings, buildingId, roomId, deviceId, sender) match {

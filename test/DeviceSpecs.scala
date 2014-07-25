@@ -5,10 +5,17 @@ import scala.concurrent.duration._
 import actors._
 import actors.DeviceActor
 import actors.DeviceActor._
-import actors.BulbActor
+import actors.device.BulbActor
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
-import akka.testkit.TestProbe
+import akka.testkit.Tesimport actors.device.SpeakerActor
+tProbe
+import actors.device.ThermometerActor
+import actors.device.SoundSensorActor
+import actors.device.LightSensorActor
+import actors.device.ButtonActor
+import actors.device.SwitchActor
+import actors.device.ServoActor
 
 @RunWith(classOf[JUnitRunner])
 class DevicesSpec(_system: ActorSystem) extends TestKit(_system)

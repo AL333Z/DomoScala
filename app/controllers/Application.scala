@@ -86,12 +86,12 @@ object Application extends Controller {
   def getTimeoutFuture = Promise.timeout("Timeout elapsed.", 5.second)
 
   def getBuildingFuture: Future[Set[Building]] =
-    (domo ? GetBuildings).asInstanceOf[Future[Set[Building]]]
+    (domo ? GetBuildings).mapTo[Set[Building]]
 
   def getRoomsFuture(buildingId: String): Future[Set[Room]] =
-    (domo ? GetRooms(buildingId)).asInstanceOf[Future[Set[Room]]]
+    (domo ? GetRooms(buildingId)).mapTo[Set[Room]]
 
-  def getDevicesFuture(buildingId: String, roomId: String): Future[Any] =
-    (domo ? GetDevices(buildingId, roomId)).asInstanceOf[Future[Set[ActorRef]]]
+  def getDevicesFuture(buildingId: String, roomId: String): Future[Map[String, ActorRef]] =
+    (domo ? GetDevices(buildingId, roomId)).mapTo[Map[String, ActorRef]]
 
 }

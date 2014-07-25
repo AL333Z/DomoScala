@@ -2,10 +2,15 @@ package actors
 
 import akka.actor.{ Actor, ActorLogging }
 import scala.concurrent.duration.Duration
-import akka.actor.Props
 
 object DeviceActor {
 
+  /**
+   * DeviceStatus represents an abstract device status related to a single
+   * device actor. This class take the pathName of the actor that generates the
+   * status message, since when an actor publish a message on the akka event
+   * bus, the sender ActorRef is not preserved.
+   */
   abstract class DeviceStatus(val pathName: String)
 
   class SetActivation(value: Double)
@@ -18,14 +23,20 @@ object DeviceActor {
   }
 
   case object GetLightValue
-  case class LightValue(lux: Double, override val pathName: String) extends DeviceStatus(pathName) {
+
+  case class LightValue(lux: Double, override val pathName: String)
+    extends DeviceStatus(pathName) {
+
     override def equals(obj: Any) = {
       this.lux == obj.asInstanceOf[LightValue].lux
     }
   }
 
   case object GetTemperature
-  case class Temperature(celsiusTemp: Double, override val pathName: String) extends DeviceStatus(pathName) {
+
+  case class Temperature(celsiusTemp: Double, override val pathName: String)
+    extends DeviceStatus(pathName) {
+
     override def equals(obj: Any) = {
       this.celsiusTemp == obj.asInstanceOf[Temperature].celsiusTemp
     }
@@ -44,7 +55,9 @@ object DeviceActor {
   }
 
   object GetSoundValue
-  case class SoundValue(decibels: Double, override val pathName: String) extends DeviceStatus(pathName) {
+  case class SoundValue(decibels: Double, override val pathName: String)
+    extends DeviceStatus(pathName) {
+
     override def equals(obj: Any) = {
       this.decibels == obj.asInstanceOf[SoundValue].decibels
     }
