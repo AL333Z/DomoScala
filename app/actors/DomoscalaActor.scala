@@ -8,6 +8,7 @@ import actors.DeviceActor._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import actors.device._
+
 case class Room(val id: String, val devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
 
@@ -86,7 +87,8 @@ class DomoscalaActor extends Actor with ActorLogging {
     }
   }
 
-  def main(buildings: Set[Building], meshnetActorRef: Option[ActorRef]): Receive = {
+  def main(buildings: Set[Building],
+    meshnetActorRef: Option[ActorRef]): Receive = {
 
     case GetBuildings => sender ! buildings
 
@@ -122,7 +124,9 @@ class DomoscalaActor extends Actor with ActorLogging {
   /*
    * Utility methods, to get entities and manage limit cases
    */
-  def getRooms(buildings: Set[Building], buildingId: String, sender: ActorRef): Option[Set[Room]] = {
+  def getRooms(buildings: Set[Building], buildingId: String,
+    sender: ActorRef): Option[Set[Room]] = {
+
     buildings.filter(_.id == buildingId).toList match {
       case (x :: _) => Some(x.rooms)
       case Nil => {
@@ -136,7 +140,9 @@ class DomoscalaActor extends Actor with ActorLogging {
     }
   }
 
-  def getDevices(buildings: Set[Building], buildingId: String, roomId: String, sender: ActorRef): Option[Map[String, ActorRef]] = {
+  def getDevices(buildings: Set[Building], buildingId: String, roomId: String,
+    sender: ActorRef): Option[Map[String, ActorRef]] = {
+
     getRooms(buildings, buildingId, sender) match {
       case Some(rooms) => rooms.filter(_.id == roomId).toList match {
         case (x :: _) => Some(x.devices)
@@ -153,7 +159,9 @@ class DomoscalaActor extends Actor with ActorLogging {
     }
   }
 
-  def getDevice(buildings: Set[Building], buildingId: String, roomId: String, deviceId: String, sender: ActorRef): Option[ActorRef] = {
+  def getDevice(buildings: Set[Building], buildingId: String, roomId: String,
+    deviceId: String, sender: ActorRef): Option[ActorRef] = {
+
     getDevices(buildings, buildingId, roomId, sender) match {
       case Some(devicesMap) => devicesMap.get(deviceId) match {
         case Some(devActorRef) => Some(devActorRef)

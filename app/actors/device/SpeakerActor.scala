@@ -11,7 +11,7 @@ object SpeakerActor {
 
 class SpeakerActor(name: String) extends DeviceActor(name) {
   def receive = {
-//    case PlayBeep => sender ! Ok
-    case _ => sender ! UnsupportedAction
+    case PlayBeep => sender ! Ok
+//    case _ => sender ! UnsupportedAction
   }
 }

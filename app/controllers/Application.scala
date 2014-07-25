@@ -31,7 +31,7 @@ object Application extends Controller {
   }
 
   def reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String) =
-    WebSocket.acceptWithActor[String, String] { request =>
+    WebSocket.acceptWithActor[String, JsValue] { request =>
       out => {     
     	Logger.debug("Push req received from request: " + request.toString)
         DeviceStatusWebSocketActor.props(out, buildingId, roomId, deviceId)

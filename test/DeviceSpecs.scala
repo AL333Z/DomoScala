@@ -1,21 +1,13 @@
 import org.scalatest.{ BeforeAndAfterAll, FlatSpecLike, Matchers }
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import scala.concurrent.duration._
-import actors._
+import akka.testkit.TestProbe
 import actors.DeviceActor
 import actors.DeviceActor._
-import actors.device.BulbActor
+import actors.device._
+import scala.concurrent.duration._
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
-import akka.testkit.Tesimport actors.device.SpeakerActor
-tProbe
-import actors.device.ThermometerActor
-import actors.device.SoundSensorActor
-import actors.device.LightSensorActor
-import actors.device.ButtonActor
-import actors.device.SwitchActor
-import actors.device.ServoActor
 
 @RunWith(classOf[JUnitRunner])
 class DevicesSpec(_system: ActorSystem) extends TestKit(_system)

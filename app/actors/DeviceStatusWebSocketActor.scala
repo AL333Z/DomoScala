@@ -4,6 +4,7 @@ import akka.actor._
 import actors.DeviceActor._
 import play.libs.Akka
 import actors.DomoscalaActor.GetDevice
+import play.api.libs.json._
 
 object DeviceStatusWebSocketActor {
   def props(out: ActorRef, buildingId: String, roomId: String, devId: String) =
@@ -15,8 +16,8 @@ object DeviceStatusWebSocketActor {
  * client. This actor subscribe itself to the Akka Event Bus, and updates its
  * client with a fresh device status value.
  */
-class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String, roomId: String,
-  deviceId: String) extends Actor with ActorLogging {
+class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String,
+  roomId: String, deviceId: String) extends Actor with ActorLogging {
 
   override def preStart() = {
     println("Subscribing to DevicStatus events..")
@@ -38,8 +39,8 @@ class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String, roomId: Stri
   def main(deviceRef: ActorRef): Receive = {
     // receiving from event stream, need to filter since I'm checking for a 
     // specific source actor device
-    case status: DeviceStatus if (status.pathName == deviceRef.path.name) =>
-      out ! status.toString
+    case status: DeviceStatus if (status.pathName.get == deviceRef.path.name) =>
+      out ! Json.toJson(status)
   }
 
   // initially, we have to wait the ActorRef of our related DeviceActor.

@@ -12,7 +12,7 @@ object ButtonActor {
 class ButtonActor(name: String) extends DeviceActor(name) {
   def receive = {
     // TODO add some amazing behavior ;)
-//    case Click => sender ! Ok
-    case _ => sender ! UnsupportedAction
+    case Click => sender ! Ok
+//    case _ => sender ! UnsupportedAction
   }
 }
