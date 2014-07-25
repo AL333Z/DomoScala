@@ -19,14 +19,15 @@ object LightSensorActor {
 class LightSensorActor(name: String) extends DeviceActor(name) with ActorLogging {
 
   //TODO publish values from a hot observable :), not from a scheduler...
-  Akka.system.scheduler.schedule(1000 milliseconds, 10000 milliseconds) {
-    println("Gonna pubblish new light value..")
-    Akka.system.eventStream.publish(LightValue(Random.nextFloat, Some(self.path.name)))
-  }
+  // scheduler doesnt run when testing
+//  Akka.system.scheduler.schedule(1000 milliseconds, 10000 milliseconds) {
+//    println("Gonna pubblish new light value..")
+//    Akka.system.eventStream.publish(LightValue(Random.nextFloat, Some(self.path.name)))
+//  }
 
   def receive = {
     //TODO replace with some great behavior ;)
     case GetLightValue => sender ! LightValue(1.0)
-    //    case _ => sender ! UnsupportedAction
+    case _ => sender ! UnsupportedAction
   }
 }

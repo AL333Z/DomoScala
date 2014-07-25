@@ -14,6 +14,6 @@ class SwitchActor(name: String) extends DeviceActor(name) {
     //TODO add implementation
     case On => sender ! Ok
     case Off => sender ! Ok
-//    case _ => sender ! UnsupportedAction
+    case _ => sender ! UnsupportedAction
   }
 }

@@ -19,6 +19,6 @@ class BulbActor(name: String) extends DeviceActor(name) {
         sender ! Failed(new Exception("Value out of valid range [0.0 ... 1.0]!"))
       case _ => sender ! Ok
     }
-//    case _ => sender ! UnsupportedAction
+    case _ => sender ! UnsupportedAction
   }
 }
