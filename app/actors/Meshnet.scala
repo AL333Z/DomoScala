@@ -41,8 +41,7 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging {
     val networkSetupThread = new layer3Base.NetworkSetupThread
     networkSetupThread.run() // dirty hack to launch the legacy java code in the actor thread
 
-    //TODO check if we can use schedulers
-    //Akka.system.scheduler.scheduleOnce(4000 milliseconds, self, NetworkSetupCompleted)
+    // this is blocking, but everything on this actor will be blocking... it just wastes 1 thread for each MeshNet base
     Thread.sleep(4000)
   }
 

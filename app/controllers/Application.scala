@@ -1,8 +1,5 @@
 package controllers
 
-import actors.{ MeshnetToDeviceMessage, MeshnetBase, DeviceActor }
-import actors.DeviceActor.On
-import akka.actor.{ PoisonPill, Props }
 import play.api._
 import play.api.libs.concurrent.Akka
 import play.api.mvc._
@@ -45,7 +42,7 @@ object Application extends Controller {
       case res: Set[_] => Ok(Json.obj(
         "status" -> "OK",
         "buildings" -> res.asInstanceOf[Set[Building]]))
-      case Failed(err) => BadRequest(err.getMessage())
+      case Failed(err) => BadRequest(err.getMessage)
       case t: String => InternalServerError(t)
     }
   }
@@ -57,7 +54,7 @@ object Application extends Controller {
       case res: Set[_] => Ok(Json.obj(
         "status" -> "OK",
         "rooms" -> res.asInstanceOf[Set[Room]]))
-      case Failed(err) => BadRequest(err.getMessage())
+      case Failed(err) => BadRequest(err.getMessage)
       case t: String => InternalServerError(t)
     }
   }
@@ -71,7 +68,7 @@ object Application extends Controller {
         "devices" -> res.asInstanceOf[Map[String, ActorRef]].map {
           case (id, actor) => (id, actor.path.toString)
         }))
-      case Failed(err) => BadRequest(err.getMessage())
+      case Failed(err) => BadRequest(err.getMessage)
       case t: String => InternalServerError(t)
     }
   }

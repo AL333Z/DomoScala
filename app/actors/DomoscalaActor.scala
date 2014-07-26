@@ -9,7 +9,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import actors.device._
 
-case class Room(val id: String, val devices: Map[String, ActorRef])
+case class Room(id: String, devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
 
   // implicit Json serializer
@@ -21,7 +21,7 @@ object Room extends ((String, Map[String, ActorRef]) => Room) {
     }
 }
 
-case class Building(val id: String, val rooms: Set[Room])
+case class Building(id: String, rooms: Set[Room])
 object Building extends ((String, Set[Room]) => Building) {
 
   // implicit Json serializer

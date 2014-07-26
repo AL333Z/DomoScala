@@ -3,7 +3,6 @@ package actors
 import akka.actor.{ Actor, ActorLogging }
 import scala.concurrent.duration.Duration
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 /**
  * This object contains all the messages that can be exchanged between an actor
