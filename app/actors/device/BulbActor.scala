@@ -4,13 +4,14 @@ import actors.DeviceActor._
 import akka.actor.Props
 import actors.DeviceActor
 import akka.actor.actorRef2Scala
+import akka.event.LoggingReceive
 
 object BulbActor {
   def props(name: String): Props = Props(classOf[BulbActor], name)
 }
 
 class BulbActor(name: String) extends DeviceActor(name) {
-  def receive = {
+  def receive = LoggingReceive {
     //TODO replace with some great behavior ;)
     case On => sender ! Ok
     case Off => sender ! Failed(new Throwable("A"))
