@@ -1,10 +1,11 @@
 package actors
 
-import akka.actor._
 import actors.DeviceActor._
-import play.libs.Akka
 import actors.DomoscalaActor.GetDevice
+import akka.actor._
+import akka.event.LoggingReceive
 import play.api.libs.json._
+import play.libs.Akka
 
 object DeviceStatusWebSocketActor {
   def props(out: ActorRef, buildingId: String, roomId: String, devId: String) =
@@ -20,26 +21,25 @@ class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String,
   roomId: String, deviceId: String) extends Actor with ActorLogging {
 
   override def preStart() = {
-    println("Subscribing to DevicStatus events..")
-    val sub = context.system.eventStream.subscribe(self, classOf[DeviceStatus])
-    println("Subscribed? " + sub)
-
     // look for our "root" actor, and look for given device actor
     val domo = Akka.system.actorSelection("user/domoscala")
     domo ! GetDevice(buildingId, roomId, deviceId)
   }
 
-  def init: Receive = {
+  def init: Receive = LoggingReceive {
     case devActor: ActorRef =>
-      println("Received device actor" + devActor.toString +
-        "Going to listen to events and pushing out..")
+
+      val sub = context.system.eventStream.subscribe(self, classOf[DeviceStatus])
+//      log.info("Subscribing to dev " + devActor.path.name + " with succ? " + sub)
+
       context.become(main(devActor))
   }
 
-  def main(deviceRef: ActorRef): Receive = {
+  def main(deviceRef: ActorRef): Receive = LoggingReceive {
     // receiving from event stream, need to filter since I'm checking for a 
-    // specific source actor device
+    // specific event source actor device
     case status: DeviceStatus if (status.pathName.get == deviceRef.path.name) =>
+      //    case status: DeviceStatus => // only for debugging purpose..
       out ! Json.toJson(status)
   }
 

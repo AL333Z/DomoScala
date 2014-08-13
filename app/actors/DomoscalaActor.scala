@@ -8,6 +8,7 @@ import actors.DeviceActor._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import actors.device._
+import akka.event.LoggingReceive
 
 case class Room(id: String, devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
@@ -53,7 +54,7 @@ class DomoscalaActor extends Actor with ActorLogging {
 
   def receive = init
 
-  def init: Receive = {
+  def init: Receive = LoggingReceive {
     case Some(meshnetActorRef) => {
       //TODO take some configuration from somewhere (DB, json file, ...)
 
@@ -61,6 +62,7 @@ class DomoscalaActor extends Actor with ActorLogging {
 
     }
     case None => {
+      // TODO move this stuff to test specs
       // we are just simultating stuff, create some demo actors
       val bulbActor0 = context.actorOf(BulbActor.props("Bulb0"))
       val bulbActor1 = context.actorOf(BulbActor.props("Bulb1"))
@@ -88,7 +90,7 @@ class DomoscalaActor extends Actor with ActorLogging {
   }
 
   def main(buildings: Set[Building],
-    meshnetActorRef: Option[ActorRef]): Receive = {
+    meshnetActorRef: Option[ActorRef]): Receive = LoggingReceive {
 
     case GetBuildings => sender ! buildings
 

@@ -11,6 +11,6 @@ libraryDependencies ++= Seq(
   ws,
   "com.typesafe.akka" %% "akka-contrib" % "2.3.3",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.3",
-  "org.scalatest" % "scalatest_2.11" % "2.2.0",
+  "org.scalatestplus" %% "play" % "1.1.0" % "test",
   "org.rxtx" % "rxtx" % "2.1.7"
 )

@@ -12,7 +12,7 @@ object ThermometerActor {
 
 class ThermometerActor(name: String) extends DeviceActor(name) {
   def receive = LoggingReceive {
-    case GetTemperature => sender ! Temperature(30.0f)
+    case GetTemperature => sender ! TemperatureValue(30.0f)
     case _ => sender ! UnsupportedAction
   }
 }
