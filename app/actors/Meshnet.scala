@@ -8,18 +8,37 @@ import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 import akka.actor.ActorLogging
 import play.Logger
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
+import akka.actor.Props
 
 /**
  * Companion object of MeshnetBase
  */
 object MeshnetBase {
+  def props(port: CommPortIdentifier, name: String): Props = Props(classOf[MeshnetBase], name)
   def getGoodPort: Option[CommPortIdentifier] = {
-    val ports = CommPortIdentifier.getPortIdentifiers.asInstanceOf[java.util.Enumeration[CommPortIdentifier]].toVector
-    Logger.info("Available serial ports: " + ports.map(_.getName))
-    val goodPorts = ports.filter(x => x.getName.contains("tty.usbmodem") || x.getName.contains("ttyACM"))
-    goodPorts.toList match {
-      case (x :: _) => Some(x)
-      case Nil => None
+
+    val tryPorts = Try(CommPortIdentifier.getPortIdentifiers
+      .asInstanceOf[java.util.Enumeration[CommPortIdentifier]].toVector)
+
+    tryPorts match {
+      case Success(ports) => {
+        Logger.info("Available serial ports: " + ports.map(_.getName))
+        val goodPorts = ports.filter(x => x.getName.contains("tty.usbmodem")
+          || x.getName.contains("ttyACM"))
+
+        goodPorts.toList match {
+          case (x :: _) => Some(x)
+          case Nil => None
+        }
+      }
+      case Failure(ex) => {
+        Logger.error("Error getting availlable ports. Missing RXTX? Message: " +
+          ex.toString())
+        None
+      }
     }
   }
 }

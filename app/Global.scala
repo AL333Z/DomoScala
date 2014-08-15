@@ -19,16 +19,22 @@ object Global extends GlobalSettings {
 
     // check if there are some good port, and start the system
     MeshnetBase.getGoodPort.map { port =>
-      // starting meshnet with given good port found
-      val mesh = Akka.system.actorOf(Props[MeshnetBase], name = "meshnetbase")
-      val domo = Akka.system.actorOf(Props[DomoscalaActor], name = "domoscala")
+
+      // starting meshnet actor with given good port found
+      val mesh = Akka.system.actorOf(MeshnetBase.props(port, "meshnetbase"))
+
+      // starting and initializing domoscala actor
+      val domo = Akka.system.actorOf(DomoscalaActor.props("domoscala"))
       domo ! Some(mesh)
-      Logger.info("Initialized Meshnet.")
+
+      Logger.info("Initialized Meshnet and DomoScala actors.")
     }.getOrElse {
-      // just playing
+      
+      // just playing, starting and initializing domoscala actor with demo conf
       val domo = Akka.system.actorOf(Props[DomoscalaActor], name = "domoscala")
       domo ! None
-      Logger.info("Meshnet not detected, running in simulation mode.")
+
+      Logger.info("Meshnet not detected, running DomoScala in simulation mode.")
     }
   }
 

@@ -9,6 +9,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import actors.device._
 import akka.event.LoggingReceive
+import akka.actor.Props
 
 case class Room(id: String, devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
@@ -37,6 +38,8 @@ object Building extends ((String, Set[Room]) => Building) {
  * the system
  */
 object DomoscalaActor {
+  def props(name: String): Props = Props(classOf[DomoscalaActor], name)
+  
   object GetBuildings
   case class GetRooms(buildingId: String)
   case class GetDevices(buildingId: String, roomId: String)
@@ -49,6 +52,9 @@ object DomoscalaActor {
  * This actor wraps the structure of the system.
  * It contains a `Set` of `Building`. This set can be also dynamically changed.
  * The structure of the system is returned only via message-passing.
+ * To initialize the system, the first message received can be:
+ * - an ActorRef of the meshnet actor wrapper
+ * - None, if we want to simulate a system (testing, demo, ...)
  */
 class DomoscalaActor extends Actor with ActorLogging {
 
@@ -62,7 +68,7 @@ class DomoscalaActor extends Actor with ActorLogging {
 
     }
     case None => {
-      // TODO move this stuff to test specs
+      // TODO maybe move this stuff to test specs? 
       // we are just simultating stuff, create some demo actors
       val bulbActor0 = context.actorOf(BulbActor.props("Bulb0"))
       val bulbActor1 = context.actorOf(BulbActor.props("Bulb1"))
@@ -96,6 +102,7 @@ class DomoscalaActor extends Actor with ActorLogging {
 
     case GetRooms(buildingId) =>
       getRooms(buildings, buildingId, sender).map(set => sender ! set)
+
     case GetDevices(buildingId, roomId) =>
       getDevices(buildings, buildingId, roomId, sender).map(m => sender ! m)
 
@@ -124,7 +131,7 @@ class DomoscalaActor extends Actor with ActorLogging {
   }
 
   /*
-   * Utility methods, to get entities and manage limit cases
+   * Utility methods, to get entities and manage edge cases
    */
   def getRooms(buildings: Set[Building], buildingId: String,
     sender: ActorRef): Option[Set[Room]] = {
