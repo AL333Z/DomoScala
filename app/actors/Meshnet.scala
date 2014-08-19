@@ -24,7 +24,7 @@ object MeshnetBase {
       Try(CommPortIdentifier.getPortIdentifiers
         .asInstanceOf[java.util.Enumeration[CommPortIdentifier]].toVector)
     } catch {
-      case e: Exception => Failure(e)
+      case e: Throwable => Failure(e)
     }
 
     tryPorts match {
