@@ -20,8 +20,12 @@ object MeshnetBase {
   def props(port: CommPortIdentifier, name: String): Props = Props(classOf[MeshnetBase], name)
   def getGoodPort: Option[CommPortIdentifier] = {
 
-    val tryPorts = Try(CommPortIdentifier.getPortIdentifiers
-      .asInstanceOf[java.util.Enumeration[CommPortIdentifier]].toVector)
+    val tryPorts = try {
+      Try(CommPortIdentifier.getPortIdentifiers
+        .asInstanceOf[java.util.Enumeration[CommPortIdentifier]].toVector)
+    } catch {
+      case e: Exception => Failure(e)
+    }
 
     tryPorts match {
       case Success(ports) => {
