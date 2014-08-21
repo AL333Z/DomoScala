@@ -12,5 +12,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-contrib" % "2.3.3",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.3",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
-  "org.rxtx" % "rxtx" % "2.1.7"
+  "org.rxtx" % "rxtx" % "2.1.7",
+  "org.webjars" % "webjars-play_2.11" % "2.3.0",
+  "org.webjars" % "bootstrap" % "3.2.0"
 )
