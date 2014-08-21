@@ -1,16 +1,14 @@
 package actors
 
-import actors.MeshnetBase.ToDeviceMessage
-import akka.actor.Actor
+import actors.MeshnetBase.{SubscribeToMessagesFromDevice, ToDeviceMessage}
+import akka.actor.{ActorRef, Actor, ActorLogging, Props}
 import com.mattibal.meshnet.{ Device, SerialRXTXComm, Layer3Base }
 import gnu.io._
 import scala.collection.JavaConversions._
-import akka.actor.ActorLogging
 import play.Logger
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
-import akka.actor.Props
 
 /**
  * Companion object of MeshnetBase
@@ -49,9 +47,16 @@ object MeshnetBase {
   case class ToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
 
   case class FromDeviceMessage(sourceDevId: Int, command: Int, data: Array[Byte])
-  
-  
+
+  /**
+   * The sender actor of this message will be subscribed to receive Meshnet messages coming from
+   * the device specified as argument
+   */
+  case class SubscribeToMessagesFromDevice(deviceId: Int)
 }
+
+
+
 
 /**
  * This actor represent a MeshNet base, something capable of running a JVM (for
@@ -65,6 +70,8 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging {
 
   val layer3Base = new Layer3Base
 
+  var subscribedActors: Map[Int, Set[ActorRef]] = Map()
+
   override def preStart() = {
     val serialComm = new SerialRXTXComm(port, layer3Base)
     val networkSetupThread = new layer3Base.NetworkSetupThread
@@ -74,10 +81,16 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging {
     Thread.sleep(4000)
   }
 
+
   def receive = {
+
     case ToDeviceMessage(destinationId, command, data) => {
       val device = Device.getDeviceFromUniqueId(destinationId)
       device.sendCommand(command, data)
+    }
+
+    case SubscribeToMessagesFromDevice(deviceId) => {
+      subscribedActors.put(deviceId, subscribedActors.getOrElse(deviceId, Set())+context.sender())
     }
   }
 }
