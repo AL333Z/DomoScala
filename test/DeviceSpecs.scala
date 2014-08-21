@@ -6,10 +6,7 @@ import actors.DeviceActor
 import actors.DeviceActor._
 import actors.device._
 import scala.concurrent.duration._
-import org.scalatest.junit.JUnitRunner
-import org.junit.runner.RunWith
 
-@RunWith(classOf[JUnitRunner])
 class DevicesSpec(_system: ActorSystem) extends TestKit(_system)
   with Matchers
   with FlatSpecLike
@@ -250,7 +247,7 @@ class DevicesSpec(_system: ActorSystem) extends TestKit(_system)
 
     def expectAnyValidThermometerMsg = {
       testProbe.expectMsgAnyClassOf(5.second,
-        classOf[Failed], classOf[Temperature])
+        classOf[Failed], classOf[TemperatureValue])
     }
 
     def sendValidActionAndExpectValidThermometerMsg(msg: AnyRef) = {

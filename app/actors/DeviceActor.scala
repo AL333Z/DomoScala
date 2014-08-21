@@ -21,7 +21,7 @@ object DeviceActor {
     implicit val baseImplicitWrites = new Writes[DeviceStatus] {
       def writes(devStatus: DeviceStatus): JsValue = devStatus match {
         case s: LightValue => LightValue.writes.writes(s)
-        case s: Temperature => Temperature.writes.writes(s)
+        case s: TemperatureValue => TemperatureValue.writes.writes(s)
         case s: SoundValue => SoundValue.writes.writes(s)
       }
     }
@@ -94,20 +94,20 @@ object DeviceActor {
   /**
    * Response message, containing actual temperature value
    */
-  case class Temperature(celsiusTemp: Double,
+  case class TemperatureValue(celsiusTemp: Double,
     override val pathName: Option[String] = None) extends DeviceStatus(pathName) {
 
     override def equals(obj: Any) = {
-      this.celsiusTemp == obj.asInstanceOf[Temperature].celsiusTemp
+      this.celsiusTemp == obj.asInstanceOf[TemperatureValue].celsiusTemp
     }
   }
 
   /**
    * Companion object of Temperature
    */
-  object Temperature {
-    val writes = new Writes[Temperature] {
-      def writes(temp: Temperature): JsValue = {
+  object TemperatureValue {
+    val writes = new Writes[TemperatureValue] {
+      def writes(temp: TemperatureValue): JsValue = {
         Json.obj("temperature" -> temp.celsiusTemp)
       }
     }
