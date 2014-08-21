@@ -1,5 +1,5 @@
 import play.api._
-import actors.{ MeshnetToDeviceMessage, MeshnetBase, DeviceActor }
+import actors.{ MeshnetBase, DeviceActor }
 import akka.actor.{ PoisonPill, Props }
 import play.api._
 import play.api.libs.concurrent.Akka

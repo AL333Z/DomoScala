@@ -1,6 +1,6 @@
 package actors
 
-import actors.MeshnetBase.MeshnetToDeviceMessage
+import actors.MeshnetBase.ToDeviceMessage
 import akka.actor.Actor
 import com.mattibal.meshnet.{ Device, SerialRXTXComm, Layer3Base }
 import gnu.io._
@@ -46,9 +46,11 @@ object MeshnetBase {
   }
 
   // A message that can be sent to a MeshNet device. All real messages should extend from this.
-  case class MeshnetToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
+  case class ToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
 
-  case class MeshnetFromDeviceMessage(sourceDevId: Int, command: Int, data: Array[Byte])
+  case class FromDeviceMessage(sourceDevId: Int, command: Int, data: Array[Byte])
+  
+  
 }
 
 /**
@@ -73,7 +75,7 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging {
   }
 
   def receive = {
-    case MeshnetToDeviceMessage(destinationId, command, data) => {
+    case ToDeviceMessage(destinationId, command, data) => {
       val device = Device.getDeviceFromUniqueId(destinationId)
       device.sendCommand(command, data)
     }
