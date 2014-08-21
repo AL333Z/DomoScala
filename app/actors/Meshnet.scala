@@ -1,11 +1,10 @@
 package actors
 
+import actors.MeshnetBase.MeshnetToDeviceMessage
 import akka.actor.Actor
 import com.mattibal.meshnet.{ Device, SerialRXTXComm, Layer3Base }
 import gnu.io._
-import play.libs.Akka
 import scala.collection.JavaConversions._
-import scala.concurrent.duration._
 import akka.actor.ActorLogging
 import play.Logger
 
@@ -13,6 +12,7 @@ import play.Logger
  * Companion object of MeshnetBase
  */
 object MeshnetBase {
+
   def getGoodPort: Option[CommPortIdentifier] = {
     val ports = CommPortIdentifier.getPortIdentifiers.asInstanceOf[java.util.Enumeration[CommPortIdentifier]].toVector
     Logger.info("Available serial ports: " + ports.map(_.getName))
@@ -22,6 +22,11 @@ object MeshnetBase {
       case Nil => None
     }
   }
+
+  // A message that can be sent to a MeshNet device. All real messages should extend from this.
+  case class MeshnetToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
+
+  case class MeshnetFromDeviceMessage(sourceDevId: Int, command: Int, data: Array[Byte])
 }
 
 /**
@@ -53,5 +58,4 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging {
   }
 }
 
-// A message that can be sent to a MeshNet device. All real messages should extend from this.
-case class MeshnetToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
+
