@@ -7,7 +7,6 @@ import actors.DomoscalaActor._
 import actors.DeviceActor._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import actors.device._
 import akka.event.LoggingReceive
 import akka.actor.Props
 
@@ -46,6 +45,7 @@ object DomoscalaActor {
   case class GetDevice(buildingId: String, roomId: String, deviceId: String)
   case class GetDeviceStatus(buildingId: String, roomId: String, deviceId: String)
   case class SetDevicesStatus(buildingId: String, roomId: String, deviceId: String)
+  case class AddBuilding(building: Building)
 }
 
 /**
@@ -58,45 +58,10 @@ object DomoscalaActor {
  */
 class DomoscalaActor extends Actor with ActorLogging {
 
-  def receive = init
+  var buildings : Set[Building] = Set()
 
-  def init: Receive = LoggingReceive {
-    case Some(meshnetActorRef) => {
-      //TODO take some configuration from somewhere (DB, json file, ...)
 
-      log.info("Time to do some serious implementation :)")
-
-    }
-    case None => {
-      // TODO maybe move this stuff to test specs? 
-      // we are just simultating stuff, create some demo actors
-      val bulbActor0 = context.actorOf(BulbActor.props("Bulb0"))
-      val bulbActor1 = context.actorOf(BulbActor.props("Bulb1"))
-      val bulbActor2 = context.actorOf(BulbActor.props("Bulb2"))
-      val bulbActor3 = context.actorOf(BulbActor.props("Bulb3"))
-      val buttonActor0 = context.actorOf(ButtonActor.props("Button0"))
-      val lightSensor0 = context.actorOf(LightSensorActor.props("LightSensor0"))
-      val servo0 = context.actorOf(ServoActor.props("Servo0"))
-      val soundSensor0 = context.actorOf(SoundSensorActor.props("SoundSensor0"))
-      val speakeSensor0 = context.actorOf(SpeakerActor.props("SpeakerSensor0"))
-
-      val room0 = new Room("Room0", Map("Bulb0" -> bulbActor0,
-        "Button0" -> buttonActor0, "SoundSensor0" -> soundSensor0))
-      val room1 = new Room("Room1", Map("Bulb1" -> bulbActor1,
-        "LightSensor0" -> lightSensor0, "Servo0" -> servo0))
-      val room2 = new Room("Room2", Map("Bulb2" -> bulbActor2,
-        "Bulb3" -> bulbActor3, "SpeakerSensor0" -> speakeSensor0))
-
-      val building = new Building("Building0", Set(room0, room1, room2))
-
-      log.info("All demo actors created, starting main behavior..")
-
-      context.become(main(Set(building), None))
-    }
-  }
-
-  def main(buildings: Set[Building],
-    meshnetActorRef: Option[ActorRef]): Receive = LoggingReceive {
+  def receive = LoggingReceive {
 
     case GetBuildings => sender ! buildings
 
@@ -113,6 +78,9 @@ class DomoscalaActor extends Actor with ActorLogging {
         case None =>
       }
 
+    case AddBuilding(building) =>
+      buildings += building
+
     //TODO implementation
     case GetDeviceStatus(buildingId, roomId, deviceId) =>
       getDevice(buildings, buildingId, roomId, deviceId, sender) match {
@@ -127,7 +95,6 @@ class DomoscalaActor extends Actor with ActorLogging {
       }
 
     case _ => sender ! UnsupportedAction
-    //TODO implement dynamic add-in of building/room/devices
   }
 
   /*

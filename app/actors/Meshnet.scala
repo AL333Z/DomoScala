@@ -2,8 +2,11 @@ package actors
 
 import java.nio.ByteBuffer
 
+import actors.DomoscalaActor.AddBuilding
 import actors.MeshnetBase.{DeviceNotConnected, FromDeviceMessage, SubscribeToMessagesFromDevice, ToDeviceMessage}
+import actors.device.{ButtonActor, LightSensorActor, ThermometerActor, BulbActor}
 import akka.actor.{ActorRef, Actor, ActorLogging, Props}
+import com.mattibal.meshnet.devices.{LedTestDevice, Led1Analog2Device}
 import com.mattibal.meshnet.{ Device, SerialRXTXComm, Layer3Base }
 import gnu.io._
 import scala.collection.JavaConversions._
@@ -15,7 +18,8 @@ import scala.util.Failure
 
 object MeshnetBase {
 
-  def props(port: CommPortIdentifier, name: String): Props = Props(classOf[MeshnetBase], name)
+  def props(port: CommPortIdentifier, name: String, domoscalaActor: ActorRef): Props =
+    Props(classOf[MeshnetBase], name, domoscalaActor)
 
   def getGoodPort: Option[CommPortIdentifier] = {
 
@@ -46,19 +50,6 @@ object MeshnetBase {
   }
 
 
-  /**
-   * A "scalification" of the legacy Java method...
-   *
-   * Use this instead of Device.getDeviceFromUniqueId()
-   */
-  def getDeviceFromUniqueId(deviceId: Int) : Option[Device] = {
-    Device.getDeviceFromUniqueId(deviceId) match {
-      case null => None
-      case device: Device => Some(device)
-    }
-  }
-
-
   // A message that can be sent to a MeshNet device. All real messages should extend from this.
   case class ToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
 
@@ -75,6 +66,7 @@ object MeshnetBase {
    * because the Meshnet device identified by this deviceId is not currently connected to that MeshnetBase
    */
   case class DeviceNotConnected(deviceId: Int)
+
 }
 
 
@@ -88,7 +80,7 @@ object MeshnetBase {
  * If you want to send or receive messages with devices that are currently
  * connected to a certain MeshNet base, you have to talk with this actor.
  */
-class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging with Device.CommandReceivedListener {
+class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Actor with ActorLogging with Device.CommandReceivedListener {
 
   val layer3Base = new Layer3Base
 
@@ -102,21 +94,21 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging with
     // this is blocking, but everything on this actor will be blocking... it just wastes 1 thread for each MeshNet base
     Thread.sleep(4000)
 
-
+    createActorsFromDiscoveredDevices()
   }
 
 
   def receive = {
 
     case ToDeviceMessage(destinationId, command, data) => {
-      MeshnetBase.getDeviceFromUniqueId(destinationId) match {
+      getDeviceFromUniqueId(destinationId) match {
         case Some(device) => device.sendCommand(command, data)
         case None => sender() ! DeviceNotConnected(destinationId)
       }
     }
 
     case SubscribeToMessagesFromDevice(deviceId) => {
-      MeshnetBase.getDeviceFromUniqueId(deviceId) match {
+      getDeviceFromUniqueId(deviceId) match {
         case Some(device) => {
           device.addCommandReceivedListener(this)
           subscribedActors += ((deviceId, subscribedActors.getOrElse(deviceId, Set()) + context.sender()))
@@ -132,9 +124,50 @@ class MeshnetBase(port: CommPortIdentifier) extends Actor with ActorLogging with
   }
 
 
+  /**
+   * Callback from the Meshnet Java library thread, so I just send myself a message to avoid threading issues
+   */
   override def onCommandReceived(command: Int, deviceId: Int, data: ByteBuffer): Unit = {
-    // This is called from a Meshnet Java library thread, so I just send myself a message to avoid threading issues
     context.self ! FromDeviceMessage(deviceId, command, data.array())
+  }
+
+
+
+  /**
+   * A "scalification" of the legacy Java method...
+   *
+   * Use this instead of Device.getDeviceFromUniqueId()
+   */
+  def getDeviceFromUniqueId(deviceId: Int) : Option[Device] = {
+    Device.getDeviceFromUniqueId(deviceId) match {
+      case null => None
+      case device: Device => Some(device)
+    }
+  }
+
+
+  def createActorsFromDiscoveredDevices() {
+    val devices = Device.getKnownDevices
+    val rooms = devices.map(
+      _ match {
+        case device: Led1Analog2Device => {   // this is our battery-powered wireless test circuit
+          val devId = device.getUniqueId
+          val bulb = context.actorOf(BulbActor.props("Bulb"+devId))
+          val temp = context.actorOf(ThermometerActor.props("Thermometer"+devId))
+          val light = context.actorOf(LightSensorActor.props("LightSensor"+devId))
+          Room("Room1", Map("Bulb"+devId -> bulb, "Thermometer"+devId -> temp, "LightSensor"+devId -> light))
+        }
+
+        case device: LedTestDevice => {       // this is our Arduino shield connected with USB to the computer (Meshnet base)
+          val devId = device.getUniqueId
+          val bulb = context.actorOf(BulbActor.props("Bulb"+device.getUniqueId))
+          val button = context.actorOf(ButtonActor.props("Button"+device.getUniqueId))
+          Room("Room2", Map("Bulb"+devId -> bulb, "Button"+devId -> button))
+        }
+      }
+    )
+    val building = Building("Building1", Set()++rooms) // ++ needed to convert from mutable to immutable Set
+    domoscalaActor ! AddBuilding(building)
   }
 }
 
