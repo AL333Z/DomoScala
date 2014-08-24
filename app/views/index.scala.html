@@ -1,7 +1,9 @@
 @(message: String)
 
-@main("Welcome to Play") {
+@main("DomoScala") {
 
-    @play20.welcome(message)
+   <script type='text/javascript' src="@routes.Assets.at("javascripts/hello.js")"></script>
+   <script src="@routes.Assets.at("javascripts/ping.js")" type="text/javascript"></script>
+   <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
 
 }

@@ -19,13 +19,13 @@ GET   /:buildingId/:roomId/:deviceId        controllers.Application.getDeviceSta
 PUT   /:buildingId/:roomId/:deviceId        controllers.Application.setDevicesStatus(buildingId: String, roomId: String, deviceId: String)
 
 GET   /:buildingId/:roomId/:deviceId/push   controllers.Application.reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String)
-GET   /                                     controllers.Application.index
 
 ################################################################################
 ############################## Asset ###########################################
 ################################################################################
 
 # Map static resources from the /public folder to the /assets URL path
+
 GET   /assets/*file                         controllers.Assets.at(path="/public", file)
 GET   /webjars/*file                        controllers.WebJarAssets.at(file)
 
