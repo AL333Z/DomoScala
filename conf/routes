@@ -12,9 +12,6 @@ GET   /assets/*file                         controllers.Assets.at(path="/public"
 GET   /webjars/*file                        controllers.WebJarAssets.at(file)
 GET   /javascriptRoutes                     controllers.Application.javascriptRoutes
 
-# Home page
-GET   /                                     controllers.Application.index
-
 ################################################################################
 ############################## API #############################################
 ################################################################################
@@ -29,3 +26,5 @@ PUT   /:buildingId/:roomId/:deviceId        controllers.Application.setDevicesSt
 
 GET   /:buildingId/:roomId/:deviceId/push   controllers.Application.reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String)
 
+# Home page
+GET   /                                     controllers.Application.index

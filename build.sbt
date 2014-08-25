@@ -16,5 +16,6 @@ libraryDependencies ++= Seq(
   "org.webjars" % "webjars-play_2.11" % "2.3.0",
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.webjars" % "jquery" % "2.1.1",
-  "org.webjars" % "jquery-ui" % "1.11.1"
+  "org.webjars" % "jquery-ui" % "1.11.1",
+  "org.webjars" % "mustachejs" % "0.8.2"
 )
