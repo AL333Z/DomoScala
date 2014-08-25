@@ -27,6 +27,14 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready." + domo.pathString))
   }
 
+  def javascriptRoutes = Action { implicit request =>
+    Ok(
+      Routes.javascriptRouter("jsRoutes")(
+        routes.javascript.Application.getBuildings,
+        routes.javascript.Application.reqPushDeviceStatus
+      )).as("text/javascript")
+  }
+
   def reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String) =
     WebSocket.acceptWithActor[String, JsValue] { request =>
       out => {

@@ -10,6 +10,7 @@
 
 GET   /assets/*file                         controllers.Assets.at(path="/public", file)
 GET   /webjars/*file                        controllers.WebJarAssets.at(file)
+GET   /javascriptRoutes                     controllers.Application.javascriptRoutes
 
 # Home page
 GET   /                                     controllers.Application.index

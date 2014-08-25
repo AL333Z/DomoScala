@@ -1,9 +1,14 @@
 $(function() {
 	var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-	var dateSocket = new WS("ws://localhost:9000/Building0/Room1/LightSensor0/push");
-
+	var b = "Building0";
+	var r = "Room1";
+	var s = "LightSensor0";
+	
+	var r = jsRoutes.controllers.Application.reqPushDeviceStatus(b, r, s);
+	var ws = new WebSocket(r.webSocketURL());
+	
 	var receiveEvent = function(event) {
 		$("#data").append("Last data: " + event.data + "<br />");
 	}
-	dateSocket.onmessage = receiveEvent;
+	ws.onmessage = receiveEvent;
 });
