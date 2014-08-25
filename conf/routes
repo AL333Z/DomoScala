@@ -2,10 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
 ################################################################################
 ############################## Asset ###########################################
 ################################################################################
@@ -17,7 +13,6 @@ GET   /webjars/*file                        controllers.WebJarAssets.at(file)
 
 # Home page
 GET   /                                     controllers.Application.index
-
 
 ################################################################################
 ############################## API #############################################
