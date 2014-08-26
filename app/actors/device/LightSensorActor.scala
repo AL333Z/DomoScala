@@ -19,7 +19,7 @@ class LightSensorActor(name: String) extends DeviceActor(name) with ActorLogging
 
   //TODO publish values from a hot observable :), not from a scheduler...
   // scheduler doesnt run when testing
-  Akka.system.scheduler.schedule(1000 milliseconds, 10000 milliseconds) {
+  Akka.system.scheduler.schedule(2000 milliseconds, 2000 milliseconds) {
     println("Gonna pubblish new light value..")
     Akka.system.eventStream.publish(LightValue(Random.nextFloat, Some(self.path.name)))
   }

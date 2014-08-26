@@ -8,7 +8,7 @@ $(function() {
 		    <ul class='list-group {{roomId}}'>	\
 		    	{{#devices}}	\
 				<li class='list-group-item {{deviceId}}'>	\
-			    	<span class='badge'>{{status}}</span>	\
+			    	<span class='badge' id='{{deviceId}}'>{{status}}</span>	\
 			    	{{deviceId}}	\
 			   </li>\
 			   {{/devices}}\
@@ -37,8 +37,8 @@ $(function() {
 					d["deviceId"] = deviceIdx;
 					d["device"] = device
 
-					// TODO put here some status information, when ready ;)
-					d["status"] = "On";
+					// TODO put here initial status
+					d["status"] = "";
 
 					devices.push(d);
 				});
@@ -67,18 +67,18 @@ $(function() {
 		});
 	});
 
-	// TODO register for web socket push events and update the view with new
 	// values
-	 var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-	 var b = "Building0";
-	 var r = "Room1";
-	 var s = "LightSensor0";
-	
-	 var r = jsRoutes.controllers.Application.reqPushDeviceStatus(b, r, s);
-	 var ws = new WebSocket(r.webSocketURL());
-	
-	 var receiveEvent = function(event) {
-	 $("#data").append("Last data: " + event.data + "<br />");
-	 }
-	 ws.onmessage = receiveEvent;
+	var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
+	var b = "Building0";
+
+	var r = jsRoutes.controllers.Application.reqPushBuildingStatus(b);
+	var ws = new WebSocket(r.webSocketURL());
+
+	var receiveEvent = function(event) {
+		$("#data").append("Last data: " + event.data + "<br />");
+		var obj = $.parseJSON(event.data);
+		$("#"+obj.deviceId).html(obj.um + ": " + obj.status.value);
+		
+	}
+	ws.onmessage = receiveEvent;
 });

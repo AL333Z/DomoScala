@@ -15,6 +15,7 @@ import play.api.libs.concurrent.Promise
 import akka.actor.ActorRef
 import actors.DeviceActor._
 import play.api.libs.json._
+import actors.RoomStatusWebSocketActor
 
 object Application extends Controller {
 
@@ -31,9 +32,29 @@ object Application extends Controller {
     Ok(
       Routes.javascriptRouter("jsRoutes")(
         routes.javascript.Application.getBuildings,
-        routes.javascript.Application.reqPushDeviceStatus
-      )).as("text/javascript")
+        routes.javascript.Application.reqPushBuildingStatus,
+        routes.javascript.Application.reqPushRoomStatus,
+        routes.javascript.Application.reqPushDeviceStatus)
+    ).as("text/javascript")
   }
+
+  def reqPushBuildingStatus(buildingId: String) =
+    WebSocket.acceptWithActor[String, JsValue] { request =>
+      out => {
+        Logger.debug("Building push req received from request: " + request.toString)
+        BuildingStatusWebSocketActor.props(out, buildingId)
+      }
+    }
+
+  def reqPushRoomStatus(buildingId: String, roomId: String) =
+    WebSocket.acceptWithActor[String, JsValue] { request =>
+      out => {
+        Logger.debug("Push req received from request: " + request.toString)
+        RoomStatusWebSocketActor.props(out, buildingId, roomId)
+      }
+    }
+
+  //RoomStatusWebSocketActor
 
   def reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String) =
     WebSocket.acceptWithActor[String, JsValue] { request =>

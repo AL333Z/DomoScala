@@ -10,6 +10,7 @@ import play.api.libs.functional.syntax._
 import actors.device._
 import akka.event.LoggingReceive
 import akka.actor.Props
+import actors.device.ThermometerActor
 
 case class Room(id: String, devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
@@ -73,7 +74,7 @@ class DomoscalaActor extends Actor with ActorLogging {
       val bulbActor0 = context.actorOf(BulbActor.props("Bulb0"))
       val bulbActor1 = context.actorOf(BulbActor.props("Bulb1"))
       val bulbActor2 = context.actorOf(BulbActor.props("Bulb2"))
-      val bulbActor3 = context.actorOf(BulbActor.props("Bulb3"))
+      val tempSensor0 = context.actorOf(ThermometerActor.props("Term0"))
       val buttonActor0 = context.actorOf(ButtonActor.props("Button0"))
       val lightSensor0 = context.actorOf(LightSensorActor.props("LightSensor0"))
       val servo0 = context.actorOf(ServoActor.props("Servo0"))
@@ -85,7 +86,7 @@ class DomoscalaActor extends Actor with ActorLogging {
       val room1 = new Room("Room1", Map("Bulb1" -> bulbActor1,
         "LightSensor0" -> lightSensor0, "Servo0" -> servo0))
       val room2 = new Room("Room2", Map("Bulb2" -> bulbActor2,
-        "Bulb3" -> bulbActor3, "SpeakerSensor0" -> speakeSensor0))
+        "Temp0" -> tempSensor0, "SpeakerSensor0" -> speakeSensor0))
 
       val building = new Building("Building0", Set(room0, room1, room2))
 

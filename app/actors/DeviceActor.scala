@@ -16,7 +16,7 @@ object DeviceActor {
    * status message, since when an actor publish a message on the akka event
    * bus, the sender ActorRef is not preserved.
    */
-  sealed abstract class DeviceStatus(val pathName: Option[String] = None)
+  sealed abstract class DeviceStatus(val um:String, val pathName: Option[String] = None)
   object DeviceStatus {
     implicit val baseImplicitWrites = new Writes[DeviceStatus] {
       def writes(devStatus: DeviceStatus): JsValue = devStatus match {
@@ -64,7 +64,7 @@ object DeviceActor {
    * Response message, containing actual light value
    */
   case class LightValue(lux: Double,
-    override val pathName: Option[String] = None) extends DeviceStatus(pathName) {
+    override val pathName: Option[String] = None) extends DeviceStatus("lux", pathName) {
 
     override def equals(obj: Any) = {
       this.lux == obj.asInstanceOf[LightValue].lux
@@ -77,7 +77,7 @@ object DeviceActor {
   object LightValue {
     val writes = new Writes[LightValue] {
       def writes(lightValue: LightValue): JsValue = {
-        Json.obj("lux" -> lightValue.lux)
+        Json.obj("value" -> lightValue.lux)
       }
     }
   }
@@ -95,7 +95,7 @@ object DeviceActor {
    * Response message, containing actual temperature value
    */
   case class TemperatureValue(celsiusTemp: Double,
-    override val pathName: Option[String] = None) extends DeviceStatus(pathName) {
+    override val pathName: Option[String] = None) extends DeviceStatus("celsius", pathName) {
 
     override def equals(obj: Any) = {
       this.celsiusTemp == obj.asInstanceOf[TemperatureValue].celsiusTemp
@@ -108,7 +108,7 @@ object DeviceActor {
   object TemperatureValue {
     val writes = new Writes[TemperatureValue] {
       def writes(temp: TemperatureValue): JsValue = {
-        Json.obj("temperature" -> temp.celsiusTemp)
+        Json.obj("value" -> temp.celsiusTemp)
       }
     }
   }
@@ -152,7 +152,7 @@ object DeviceActor {
    * Response message, containing actual sound value
    */
   case class SoundValue(decibels: Double,
-    override val pathName: Option[String] = None) extends DeviceStatus(pathName) {
+    override val pathName: Option[String] = None) extends DeviceStatus("decibels", pathName) {
 
     override def equals(obj: Any) = {
       this.decibels == obj.asInstanceOf[SoundValue].decibels
@@ -165,7 +165,7 @@ object DeviceActor {
   object SoundValue {
     val writes = new Writes[SoundValue] {
       def writes(soundValue: SoundValue): JsValue = {
-        Json.obj("decibels" -> soundValue.decibels)
+        Json.obj("value" -> soundValue.decibels)
       }
     }
   }
