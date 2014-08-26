@@ -15,19 +15,15 @@ object Global extends GlobalSettings {
     Logger.info("******************Application has started.****************")
     Logger.info("**********************************************************")
 
+    val domoscalaActor = Akka.system.actorOf(DomoscalaActor.props("domoscala"))
+
     Logger.info("Initializing Meshnet...")
 
     // check if there are some good port, and start the system
     MeshnetBase.getGoodPort.map { port =>
 
-      // starting meshnet actor with given good port found
-      val mesh = Akka.system.actorOf(MeshnetBase.props(port, "meshnetbase"))
+      val mesh = Akka.system.actorOf(MeshnetBase.props(port, "meshnetbase", domoscalaActor))
 
-      // starting and initializing domoscala actor
-      val domo = Akka.system.actorOf(DomoscalaActor.props("domoscala"))
-      domo ! Some(mesh)
-
-      Logger.info("Initialized Meshnet and DomoScala actors.")
     }.getOrElse {
       
       // just playing, starting and initializing domoscala actor with demo conf
