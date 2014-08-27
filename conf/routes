@@ -2,9 +2,15 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
+################################################################################
+############################## Asset ###########################################
+################################################################################
+
+# Map static resources from the /public folder to the /assets URL path
+
+GET   /assets/*file                         controllers.Assets.at(path="/public", file)
+GET   /webjars/*file                        controllers.WebJarAssets.at(file)
+GET   /javascriptRoutes                     controllers.Application.javascriptRoutes
 
 ################################################################################
 ############################## API #############################################
@@ -18,18 +24,9 @@ GET   /:buildingId/:roomId/devices          controllers.Application.getDevices(b
 GET   /:buildingId/:roomId/:deviceId        controllers.Application.getDeviceStatus(buildingId: String, roomId: String, deviceId: String)
 PUT   /:buildingId/:roomId/:deviceId        controllers.Application.setDevicesStatus(buildingId: String, roomId: String, deviceId: String)
 
-GET   /:buildingId/:roomId/:deviceId/push   controllers.Application.reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String)
-GET   /                                     controllers.Application.index
-
-################################################################################
-############################## Asset ###########################################
-################################################################################
-
-# Map static resources from the /public folder to the /assets URL path
-GET   /assets/*file                         controllers.Assets.at(path="/public", file)
+GET   /push/:buildingId                     controllers.Application.reqPushBuildingStatus(buildingId: String)
+GET   /push/:buildingId/:roomId             controllers.Application.reqPushRoomStatus(buildingId: String, roomId: String)
+GET   /push/:buildingId/:roomId/:deviceId   controllers.Application.reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String)
 
 # Home page
 GET   /                                     controllers.Application.index
-
-# Map static resources from the /public folder to the /assets URL path
-GET   /assets/*file                         controllers.Assets.at(path="/public", file)

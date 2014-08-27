@@ -30,7 +30,7 @@ class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String,
     case devActor: ActorRef =>
 
       val sub = context.system.eventStream.subscribe(self, classOf[DeviceStatus])
-//      log.info("Subscribing to dev " + devActor.path.name + " with succ? " + sub)
+      //      log.info("Subscribing to dev " + devActor.path.name + " with succ? " + sub)
 
       context.become(main(devActor))
   }
@@ -40,7 +40,12 @@ class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String,
     // specific event source actor device
     case status: DeviceStatus if (status.pathName.get == deviceRef.path.name) =>
       //    case status: DeviceStatus => // only for debugging purpose..
-      out ! Json.toJson(status)
+      out ! Json.obj(
+        "buildingId"-> buildingId, 
+        "roomId"-> roomId, 
+        "deviceId"-> deviceId,
+        "um" -> status.um,
+        "status"-> status)
   }
 
   // initially, we have to wait the ActorRef of our related DeviceActor.

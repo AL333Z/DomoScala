@@ -17,10 +17,10 @@ object SoundSensorActor {
 class SoundSensorActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends DeviceActor(name, meshnetActor, deviceId) {
 
   //TODO publish values from a hot observable :), not from a scheduler...
-//  Akka.system.scheduler.schedule(1000 milliseconds, 10000 milliseconds) {
-//    println("Gonna pubblish new sound value..")
-//    Akka.system.eventStream.publish(SoundValue(Random.nextFloat, Some(self.path.name)))
-//  }
+  Akka.system.scheduler.schedule(3000 milliseconds, 2000 milliseconds) {
+    println("Gonna pubblish new sound value..")
+    Akka.system.eventStream.publish(SoundValue(Random.nextFloat, Some(self.path.name)))
+  }
 
   def receive = LoggingReceive {
     case GetSoundValue => sender ! SoundValue(1.0)

@@ -9,6 +9,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import akka.event.LoggingReceive
 import akka.actor.Props
+import actors.device.ThermometerActor
 
 case class Room(id: String, devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
