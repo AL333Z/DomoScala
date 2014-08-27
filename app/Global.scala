@@ -18,7 +18,8 @@ object Global extends GlobalSettings {
     // check if there are some good port, and start the system
     MeshnetBase.getGoodPort.map { port =>
 
-      val mesh = Akka.system.actorOf(MeshnetBase.props(port, "meshnetbase", domoscalaActor))
+      Logger.info("Using port: "+port.getName)
+      val mesh = Akka.system.actorOf(MeshnetBase.props(port, domoscalaActor))
 
     }.getOrElse {
       

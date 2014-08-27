@@ -57,7 +57,7 @@ object DomoscalaActor {
  * - an ActorRef of the meshnet actor wrapper
  * - None, if we want to simulate a system (testing, demo, ...)
  */
-class DomoscalaActor extends Actor with ActorLogging {
+class DomoscalaActor(name: String) extends Actor with ActorLogging {
 
   var buildings : Set[Building] = Set()
 

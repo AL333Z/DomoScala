@@ -18,8 +18,8 @@ import scala.util.Failure
 
 object MeshnetBase {
 
-  def props(port: CommPortIdentifier, name: String, domoscalaActor: ActorRef): Props =
-    Props(classOf[MeshnetBase], name, domoscalaActor)
+  def props(port: CommPortIdentifier, domoscalaActor: ActorRef): Props =
+    Props(classOf[MeshnetBase], port, domoscalaActor)
 
   def getGoodPort: Option[CommPortIdentifier] = {
 
@@ -88,6 +88,7 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
 
   override def preStart() = {
     val serialComm = new SerialRXTXComm(port, layer3Base)
+    Thread.sleep(3000)
     val networkSetupThread = new layer3Base.NetworkSetupThread
     networkSetupThread.run() // dirty hack to launch the legacy java code in the actor thread
 
