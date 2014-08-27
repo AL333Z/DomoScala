@@ -1,16 +1,15 @@
 package actors.device
 
 import actors.DeviceActor._
-import akka.actor.Props
+import akka.actor.{ActorRef, Props, actorRef2Scala}
 import actors.DeviceActor
-import akka.actor.actorRef2Scala
 import akka.event.LoggingReceive
 
 object ButtonActor {
-  def props(name: String): Props = Props(classOf[ButtonActor], name)
+  def props(name: String, meshnetActor: ActorRef, deviceId: Int): Props = Props(classOf[ButtonActor], name, meshnetActor, deviceId)
 }
 
-class ButtonActor(name: String) extends DeviceActor(name) {
+class ButtonActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends DeviceActor(name, meshnetActor, deviceId) {
   def receive = LoggingReceive {
     // TODO add some amazing behavior ;)
     case Click => sender ! Ok

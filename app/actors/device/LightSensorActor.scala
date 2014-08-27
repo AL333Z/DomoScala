@@ -1,8 +1,7 @@
 package actors.device
 
 import actors.DeviceActor._
-import akka.actor.Props
-import akka.actor.ActorLogging
+import akka.actor.{ActorRef, Props, ActorLogging}
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import scala.concurrent.duration._
@@ -12,10 +11,10 @@ import actors.DeviceActor
 import akka.event.LoggingReceive
 
 object LightSensorActor {
-  def props(name: String): Props = Props(classOf[LightSensorActor], name)
+  def props(name: String, meshnetActor: ActorRef, deviceId: Int): Props = Props(classOf[LightSensorActor], name, meshnetActor, deviceId)
 }
 
-class LightSensorActor(name: String) extends DeviceActor(name) with ActorLogging {
+class LightSensorActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends DeviceActor(name, meshnetActor, deviceId) with ActorLogging {
 
   //TODO publish values from a hot observable :), not from a scheduler...
   // scheduler doesnt run when testing

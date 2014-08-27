@@ -1,6 +1,6 @@
 package actors
 
-import akka.actor.{ Actor, ActorLogging }
+import akka.actor.{ActorRef, Actor, ActorLogging}
 import scala.concurrent.duration.Duration
 import play.api.libs.json._
 
@@ -204,4 +204,4 @@ object DeviceActor {
   }
 }
 
-abstract class DeviceActor(name: String) extends Actor with ActorLogging
+abstract class DeviceActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Actor with ActorLogging
