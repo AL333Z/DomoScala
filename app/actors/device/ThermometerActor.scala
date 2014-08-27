@@ -18,7 +18,7 @@ object ThermometerActor {
 class ThermometerActor(name: String) extends DeviceActor(name) {
 
   Akka.system.scheduler.schedule(1000 milliseconds, 2000 milliseconds) {
-    println("Gonna pubblish new sound value..")
+    println("Gonna pubblish new temperature value..")
     Akka.system.eventStream.publish(TemperatureValue(Random.nextFloat, Some(self.path.name)))
   }
 
