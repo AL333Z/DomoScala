@@ -1,12 +1,8 @@
-import play.api._
-import actors.{ MeshnetBase, DeviceActor }
-import akka.actor.{ PoisonPill, Props }
+import actors.{DomoscalaActor, MeshnetBase}
+import akka.actor.Props
+import play.api.Play.current
 import play.api._
 import play.api.libs.concurrent.Akka
-import play.api.mvc._
-import play.api.Play.current
-import akka.pattern.ask
-import actors.DomoscalaActor
 
 object Global extends GlobalSettings {
 
