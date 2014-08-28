@@ -159,7 +159,7 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
           Room("Room1", Map("Bulb"+devId -> bulb, "Thermometer"+devId -> temp, "LightSensor"+devId -> light))
         }
 
-        case device: LedTestDevice => {       // this is our Arduino shield connected with USB to the computer (Meshnet base)
+        case device: Device => {       // this is our Arduino shield connected with USB to the computer (Meshnet base)
           val devId = device.getUniqueId
           val bulb = context.actorOf(BulbActor.props("Bulb"+devId, self, devId))
           val button = context.actorOf(ButtonActor.props("Button"+devId, self, devId))
