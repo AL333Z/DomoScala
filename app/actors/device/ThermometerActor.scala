@@ -35,7 +35,7 @@ class ThermometerActor(name: String, meshnetActor: ActorRef, deviceId: Int) exte
   def receive = LoggingReceive {
     case GetTemperature => currTemp.foreach(sender ! TemperatureValue(_))
     case AskTemp => askTemperatureToDevice()
-    case FromDeviceMessage => parseFromDeviceMessage(_)
+    case msg: FromDeviceMessage => parseFromDeviceMessage(msg)
     case _ => sender ! UnsupportedAction
   }
 
