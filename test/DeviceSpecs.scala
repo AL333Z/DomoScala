@@ -60,7 +60,8 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
 
   }
 
-  "A ButtonActor" must {
+  // TODO the button is only a sensor! when the user physically click it, it sends a message that we should handle
+  /*"A ButtonActor" must {
     "respond properly only to Click" in {
 
       val testProbe = TestProbe()
@@ -91,7 +92,7 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
       sendUnsupportedMsgAndExpectUnsupportedAction(PlayBeep)
       sendUnsupportedMsgAndExpectUnsupportedAction(GetSoundValue)
     }
-  }
+  }*/
 
   "A LightSensorActor" must {
     "respond properly only to GetLightValue" in {
