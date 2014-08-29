@@ -39,19 +39,20 @@ class ThermometerActor(name: String, meshnetActor: ActorRef, deviceId: Int) exte
     case _ => sender ! UnsupportedAction
   }
 
+  val meshnetCommand = 3
 
   /**
    * Send a Meshnet message to the device asking a temperature reading from the temperature sensor
    */
   def askTemperatureToDevice(){
-    meshnetActor ! ToDeviceMessage(deviceId, 3, Array[Byte](0))
+    meshnetActor ! ToDeviceMessage(deviceId, meshnetCommand, Array[Byte](0))
   }
 
   /**
    * Handle a message coming from the Meshnet device that hopefully contains a temperature value
    */
   def parseFromDeviceMessage(msg: FromDeviceMessage){
-    if(msg.command == 3){
+    if(msg.command == meshnetCommand){
 
       // very low level scary stuff!!
       val buf = ByteBuffer.wrap(msg.data)
