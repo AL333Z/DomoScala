@@ -7,6 +7,7 @@ import actors.DeviceActor
 import akka.event.LoggingReceive
 import play.libs.Akka
 import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
 
 object BulbActor {
   def props(name: String, meshnetActor: ActorRef, deviceId: Int): Props = Props(classOf[BulbActor], name, meshnetActor, deviceId)
@@ -20,8 +21,8 @@ class BulbActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Dev
 
   override def preStart() = {
     // test code to blink lights :)
-    Akka.system.scheduler.schedule(1.6 seconds, 2 seconds, self, On)
-    Akka.system.scheduler.schedule(2.6 seconds, 2 seconds, self, Off)
+    Akka.system.scheduler.schedule(1 seconds, 2 seconds, self, On)
+    Akka.system.scheduler.schedule(2 seconds, 2 seconds, self, Off)
   }
 
 
