@@ -11,7 +11,7 @@ object Global extends GlobalSettings {
     Logger.info("******************Application has started.****************")
     Logger.info("**********************************************************")
 
-    val domoscalaActor = Akka.system.actorOf(DomoscalaActor.props("domoscala"))
+    val domoscalaActor = Akka.system.actorOf(DomoscalaActor.props("domoscala"), "domoscala")
 
     Logger.info("Initializing Meshnet...")
 
