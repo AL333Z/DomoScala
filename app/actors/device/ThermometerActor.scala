@@ -66,7 +66,7 @@ class ThermometerActor(name: String, meshnetActor: ActorRef, deviceId: Int) exte
 
       // back to Scala...
       currTemp = Some(tempCelsius)
-      Akka.system.eventStream.publish(TemperatureValue(tempCelsius))
+      Akka.system.eventStream.publish(TemperatureValue(tempCelsius, Some(self.path.name)))
       println("temperature: "+tempCelsius)
     }
   }
