@@ -12,12 +12,13 @@ Installation and first run
 ==========================
 
 - install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html)
+- download the [Typesafe Activator](https://typesafe.com/activator)
 - `cd <yourLocalPath>/DomoScala`
 - `play run` or `play test` or whatever you want.
 - go to [http://localhost:9000/](http://localhost:9000/)
 
 Motivations
-=========
+===========
 
 This project aims to implement a low-cost home automation system using modern technologies such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), and other exciting stuff. 
 
