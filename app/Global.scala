@@ -1,4 +1,6 @@
-import actors.{DomoscalaActor, MeshnetBase}
+import actors.device.mock.{ButtonMockActor, LightSensorMockActor, ThermometerMockActor, BulbMockActor}
+import actors.device.{ButtonActor, LightSensorActor, ThermometerActor, BulbActor}
+import actors.{Room, DomoscalaActor, MeshnetBase}
 import akka.actor.Props
 import play.api.Play.current
 import play.api._
@@ -22,12 +24,20 @@ object Global extends GlobalSettings {
       val mesh = Akka.system.actorOf(MeshnetBase.props(port, domoscalaActor))
 
     }.getOrElse {
-      
-      // just playing, starting and initializing domoscala actor with demo conf
-      val domo = Akka.system.actorOf(Props[DomoscalaActor], name = "domoscala")
-      domo ! None
 
       Logger.info("Meshnet base not detected, running DomoScala in simulation mode.")
+
+      // Create mock device actors
+
+      val bulb0 = Akka.system.actorOf(Props(classOf[BulbMockActor]), "Bulb0")
+      val button0 = Akka.system.actorOf(Props(classOf[ButtonMockActor]), "Button0")
+      Room("Room0", Map("Bulb0" -> bulb0, "Button0" -> button0))
+
+      val bulb = Akka.system.actorOf(Props(classOf[BulbMockActor]), "Bulb1")
+      val temp = Akka.system.actorOf(Props(classOf[ThermometerMockActor]), "Thermometer0")
+      val light = Akka.system.actorOf(Props(classOf[LightSensorMockActor]), "LightSensor0")
+      Room("Room1", Map("Bulb1" -> bulb, "Thermometer0" -> temp, "LightSensor0" -> light))
+
     }
   }
 
