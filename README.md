@@ -122,3 +122,28 @@ Android
 ----------
 The android app [will] be nothing special. Just an app that use REST APIs and Web Sockets to update some list views.
 It's pretty the same as the html+js fronted, but developed with **Android SDK**.
+
+Implementation
+==============
+
+Arduino and Meshnet
+-------------------
+//TODO 
+
+Actors
+------
+
+The main actor of the system is *DomoscalaActor* (`actors.DomoscalaActor.scala`). It wraps all the system configurations and structure and all other actor (and APIs) has to interact to that.
+
+*MeshnetBase* (`actors.Meshnet.scala`) wraps the interaction with meshnet library. It's a facade that allows the interaction with meshnet (and so, with physical devices) via message-passing.
+
+*DeviceActor* (`actors.DeviceActor.scala`) represents an abstract device actor. In its companion object are defined all the messages that all concrete device actor instances can accept/exchange. All concrete implementation of this actor are in `actors.device` package.
+
+The interaction between all system components is defined in `test` folder, containing all tests specs.
+
+API
+---
+
+Every APIs is **asynchronous from the bottom up**. The system handles every request in an [asynchronous, non-blocking way](https://www.playframework.com/documentation/2.3.x/ScalaAsync). Thus, if the client request a heavy operation to the server, the client will be blocked while waiting for the response, but nothing will be blocked on the server, and server resources can be used to serve other clients.
+
+[Web Sockets](https://www.playframework.com/documentation/2.3.x/ScalaWebSockets) allows the implementation of Publish/Subscribe feature. Thus, there's a **two way full duplex communication channel** between clients and the server that enable the flow of new contents from the server to the client once the contents are produced, timely.
