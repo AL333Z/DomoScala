@@ -11,9 +11,9 @@ Installation and first run
 ==========================
 
 - install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html)
-- download the [Typesafe Activator](https://typesafe.com/activator)
 - `cd <yourLocalPath>/DomoScala`
-- `play run` or `play test` or whatever you want.
+- launch Typesafe Activator script with `./activator`
+- `run` or `test` or whatever you want.
 - go to [http://localhost:9000/](http://localhost:9000/)
 
 Motivations
