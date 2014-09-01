@@ -33,7 +33,7 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
         val chosenDev = "SoundSensor0"
         val maxTimeout = 3 seconds
         val testProbe = TestProbe()
-        
+
         val wsActor = system.actorOf(DeviceStatusWebSocketActor.props(testProbe.ref,
           chosenBuilding, chosenRoom, chosenDev))
 
@@ -53,4 +53,61 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
       }
     }
   }
+
+  "The DeviceStatusWebSocketActor" when {
+    "the app is started and the actor system is running" must {
+      "respond timely when new values are produced" in {
+        val chosenBuilding = "Building0"
+        val chosenRoom = "Room0"
+        val chosenDev = "SoundSensor0"
+        val maxTimeout = 3 seconds
+        val testProbe = TestProbe()
+
+        val wsActor = system.actorOf(DeviceStatusWebSocketActor.props(testProbe.ref,
+          chosenBuilding, chosenRoom, chosenDev))
+
+        val domo = Await.result(system.actorSelection("user/domoscala").resolveOne, maxTimeout)
+        testProbe.send(domo, GetDevice(chosenBuilding, chosenRoom, chosenDev))
+        val deviceActor = testProbe.expectMsgClass(maxTimeout, classOf[ActorRef])
+
+        // pubblish some values
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActor.path.name)))
+        system.eventStream.publish(TemperatureValue(Random.nextFloat, Some(deviceActor.path.name)))
+        system.eventStream.publish(LightValue(Random.nextFloat, Some(deviceActor.path.name)))
+
+        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+
+      }
+    }
+  }
+
+  "The RoomStatusWebSocketActor" when {
+    "the app is started and the actor system is running" must {
+      "respond timely when new values are produced from its devices" in {
+        val chosenBuilding = "Building0"
+        val chosenRoom = "Room0"
+
+        val maxTimeout = 3 seconds
+        val testProbe = TestProbe()
+
+        val wsActor = system.actorOf(RoomStatusWebSocketActor.props(testProbe.ref,
+          chosenBuilding, chosenRoom))
+
+        val domo = Await.result(system.actorSelection("user/domoscala").resolveOne, maxTimeout)
+        testProbe.send(domo, GetDevices(chosenBuilding, chosenRoom))
+        val deviceActors = testProbe.expectMsgClass(maxTimeout, classOf[Map[String, ActorRef]])
+
+        // pubblish some values
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("SoundSensor0").path.name)))
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("SoundSensor0").path.name)))
+
+        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+
+      }
+    }
+  }
+
 }
