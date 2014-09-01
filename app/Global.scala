@@ -13,7 +13,7 @@ object Global extends GlobalSettings {
 
     val domoscalaActor = Akka.system.actorOf(DomoscalaActor.props("domoscala"), "domoscala")
 
-    Logger.info("Initializing Meshnet...")
+    Logger.info("Looking for Meshnet base (Arduino connected with USB)...")
 
     // check if there are some good port, and start the system
     MeshnetBase.getGoodPort.map { port =>
@@ -27,7 +27,7 @@ object Global extends GlobalSettings {
       val domo = Akka.system.actorOf(Props[DomoscalaActor], name = "domoscala")
       domo ! None
 
-      Logger.info("Meshnet not detected, running DomoScala in simulation mode.")
+      Logger.info("Meshnet base not detected, running DomoScala in simulation mode.")
     }
   }
 

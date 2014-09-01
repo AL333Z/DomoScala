@@ -32,7 +32,7 @@ object MeshnetBase {
 
     tryPorts match {
       case Success(ports) => {
-        Logger.info("Available serial ports: " + ports.map(_.getName))
+        Logger.debug("Available serial ports: " + ports.map(_.getName))
         val goodPorts = ports.filter(x => x.getName.contains("tty.usbmodem")
           || x.getName.contains("ttyACM"))
 
