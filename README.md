@@ -57,8 +57,61 @@ For example, a client can be notified of all system event (coming from all build
 GET   /push    
 ```
 
-The APIs support both **fine grained and coarse grained granularity** when querying system status (from all buildings to single sensor/actuator).
+The APIs support both **fine grained and coarse grained granularity** when querying system status. Thus, a client can request/subscribe to information for all buildings and/or for a single device.
 For more details on APIs, check `conf/routes` file.
+
+A sample response of a `GET   /buildings` request may have the following format:
+
+```json
+{  
+   status:"OK",
+   buildings:[  
+      {  
+         id:"Building0",
+         rooms:[  
+            {  
+               id:"Room0",
+               devices:{  
+                  Bulb0:"akka://application/user/domoscala/$a",
+                  Button0:"akka://application/user/domoscala/$e",
+                  SoundSensor0:"akka://application/user/domoscala/$h"
+               }
+            },
+            {  
+               id:"Room1",
+               devices:{  
+                  Bulb1:"akka://application/user/domoscala/$b",
+                  LightSensor0:"akka://application/user/domoscala/$f",
+                  Servo0:"akka://application/user/domoscala/$g"
+               }
+            },
+            {  
+               id:"Room2",
+               devices:{  
+                  Bulb2:"akka://application/user/domoscala/$c",
+                  Temp0:"akka://application/user/domoscala/$d",
+                  SpeakerSensor0:"akka://application/user/domoscala/$i"
+               }
+            }
+         ]
+      }
+   ]
+}
+```
+
+A new value published by a device, for example by a sound sensor with id `SoundSensor0` installed in a room with id `Room0` in a building with id `Building0`, may have the following format:
+
+```json
+{  
+   "buildingId":"Building0",
+   "roomId":"Room0",
+   "deviceId":"SoundSensor0",
+   "um":"decibels",
+   "status":{  
+      "value":0.6545045971870422
+   }
+}
+```
 
 Frontend
 --------
