@@ -64,33 +64,33 @@ A sample response of a `GET   /buildings` request may have the following format:
 
 ```json
 {  
-   status:"OK",
-   buildings:[  
+   "status":"OK",
+   "buildings":[  
       {  
-         id:"Building0",
-         rooms:[  
+         "id":"Building0",
+         "rooms":[  
             {  
-               id:"Room0",
-               devices:{  
-                  Bulb0:"akka://application/user/domoscala/$a",
-                  Button0:"akka://application/user/domoscala/$e",
-                  SoundSensor0:"akka://application/user/domoscala/$h"
+               "id":"Room0",
+               "devices":{  
+                  "Bulb0":"akka://application/user/domoscala/$a",
+                  "Button0":"akka://application/user/domoscala/$e",
+                  "SoundSensor0":"akka://application/user/domoscala/$h"
                }
             },
             {  
-               id:"Room1",
-               devices:{  
-                  Bulb1:"akka://application/user/domoscala/$b",
-                  LightSensor0:"akka://application/user/domoscala/$f",
-                  Servo0:"akka://application/user/domoscala/$g"
+               "id":"Room1",
+               "devices":{  
+                  "Bulb1":"akka://application/user/domoscala/$b",
+                  "LightSensor0":"akka://application/user/domoscala/$f",
+                  "Servo0":"akka://application/user/domoscala/$g"
                }
             },
             {  
-               id:"Room2",
-               devices:{  
-                  Bulb2:"akka://application/user/domoscala/$c",
-                  Temp0:"akka://application/user/domoscala/$d",
-                  SpeakerSensor0:"akka://application/user/domoscala/$i"
+               "id":"Room2",
+               "devices":{  
+                  "Bulb2":"akka://application/user/domoscala/$c",
+                  "Temp0":"akka://application/user/domoscala/$d",
+                  "SpeakerSensor0":"akka://application/user/domoscala/$i"
                }
             }
          ]
