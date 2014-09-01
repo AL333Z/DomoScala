@@ -23,8 +23,8 @@ This project aims to implement a low-cost home automation system using modern te
 
 *At the time of writing, we only implemented the core of the system, as a proof of concept.*
 
-System structure
-================
+System architecure
+==================
 The system itself is a Play framework app. Since Play is built on top of Akka, most of the system components are modeled as akka [actors](http://en.wikipedia.org/wiki/Actor_model).
 
 The app [will] allow the user to configure the structure of its buildings. Each **building** is represented as a set of **rooms**, and each room is modeled as a set of **devices**. All of this components are abstracted by **actors**, interacting via **message-passing**.
