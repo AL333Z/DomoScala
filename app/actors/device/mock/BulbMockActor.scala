@@ -19,7 +19,7 @@ class BulbMockActor extends Actor with ActorLogging {
       case value if (value < 0.0 || value > 1.0) =>
         sender ! Failed(new Exception("Value out of valid range [0.0 ... 1.0]!"))
       case value =>
-        log.info("light set to intensity "+value*100+"%")
+        log.info("light set to intensity "+(value*100).toInt+"%")
         sender ! Ok
     }
     case _ => sender ! UnsupportedAction
