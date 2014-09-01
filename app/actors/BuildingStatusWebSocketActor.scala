@@ -5,7 +5,6 @@ import akka.event.LoggingReceive
 import play.api.libs.json._
 import play.libs.Akka
 import actors.DomoscalaActor.GetRooms
-import actors.RoomStatusWebSocketActor
 
 object BuildingStatusWebSocketActor {
   def props(out: ActorRef, buildingId: String) =
@@ -20,7 +19,7 @@ object BuildingStatusWebSocketActor {
 class BuildingStatusWebSocketActor(out: ActorRef, buildingId: String) extends Actor with ActorLogging {
 
   override def preStart() = {
-    // look for our "root" actor, and look for given room actor
+    // look for our "root" actor, and look for rooms
     val domo = Akka.system.actorSelection("user/domoscala")
     domo ! GetRooms(buildingId)
   }
@@ -39,7 +38,7 @@ class BuildingStatusWebSocketActor(out: ActorRef, buildingId: String) extends Ac
     case msg => out forward msg
   }
 
-  // initially, we have to wait to receive devices of selected room
+  // initially, we have to wait to receive rooms
   def receive = init
 
 }

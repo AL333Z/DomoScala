@@ -69,9 +69,7 @@ $(function() {
 
 	// values
 	var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-	var b = "Building0";
-
-	var r = jsRoutes.controllers.Application.reqPushBuildingStatus(b);
+	var r = jsRoutes.controllers.Application.reqPushSystemStatus();
 	var ws = new WebSocket(r.webSocketURL());
 
 	var receiveEvent = function(event) {
