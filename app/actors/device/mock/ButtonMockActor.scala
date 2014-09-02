@@ -4,6 +4,8 @@ import actors.DeviceActor.UnsupportedAction
 import akka.actor.Actor
 import play.api.libs.concurrent.Akka
 import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.Play.current
 
 
 class ButtonMockActor extends Actor {
