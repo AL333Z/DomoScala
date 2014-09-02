@@ -10,7 +10,7 @@ Home automation with Scala and Arduino.
 Installation and first run
 ==========================
 
-- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html)
+- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html) (only needed if you want to control real hardware)
 - `cd <yourLocalPath>/DomoScala`
 - launch Typesafe Activator script with `./activator`
 - `run` or `test` or whatever you want.
