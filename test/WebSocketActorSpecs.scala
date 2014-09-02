@@ -29,9 +29,9 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
     "the app is started and the actor system is running" must {
       "respond timely when new values are produced" in {
         val chosenBuilding = "Building0"
-        val chosenRoom = "Room0"
-        val chosenDev = "SoundSensor0"
-        val maxTimeout = 3 seconds
+        val chosenRoom = "Room1"
+        val chosenDev = "LightSensor0"
+        val maxTimeout = 6 seconds
         val testProbe = TestProbe()
 
         val wsActor = system.actorOf(DeviceStatusWebSocketActor.props(testProbe.ref,
@@ -58,9 +58,9 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
     "the app is started and the actor system is running" must {
       "respond timely when new values are produced" in {
         val chosenBuilding = "Building0"
-        val chosenRoom = "Room0"
-        val chosenDev = "SoundSensor0"
-        val maxTimeout = 3 seconds
+        val chosenRoom = "Room1"
+        val chosenDev = "LightSensor0"
+        val maxTimeout = 6 seconds
         val testProbe = TestProbe()
 
         val wsActor = system.actorOf(DeviceStatusWebSocketActor.props(testProbe.ref,
@@ -87,7 +87,7 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
     "the app is started and the actor system is running" must {
       "respond timely when new values are produced from its devices" in {
         val chosenBuilding = "Building0"
-        val chosenRoom = "Room0"
+        val chosenRoom = "Room1"
 
         val maxTimeout = 3 seconds
         val testProbe = TestProbe()
@@ -100,8 +100,8 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
         val deviceActors = testProbe.expectMsgClass(maxTimeout, classOf[Map[String, ActorRef]])
 
         // pubblish some values
-        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("SoundSensor0").path.name)))
-        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("SoundSensor0").path.name)))
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("LightSensor0").path.name)))
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("LightSensor0").path.name)))
 
         testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
         testProbe.expectMsgClass(maxTimeout, classOf[JsValue])

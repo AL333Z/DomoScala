@@ -1,15 +1,12 @@
-import org.scalatest.{ BeforeAndAfterAll, FlatSpecLike, Matchers }
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-import akka.testkit.TestProbe
-import actors.DeviceActor
 import actors.DeviceActor._
-import actors.device._
-import scala.concurrent.duration._
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.OneAppPerSuite
+import actors.device.mock.{BulbMockActor, LightSensorMockActor, ThermometerMockActor}
+import akka.actor.Props
+import akka.testkit.TestProbe
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Play
 import play.api.libs.concurrent.Akka
+
+import scala.concurrent.duration._
 
 class DevicesSpec extends PlaySpec with OneAppPerSuite {
 
@@ -29,7 +26,7 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
     "respond properly only to On/Off/SetActivationValue" in {
 
       val testProbe = TestProbe()
-      val buld = system.actorOf(BulbActor.props("bulb1"))
+      val buld = system.actorOf(Props(classOf[BulbMockActor]))
 
       def expectAnyValidBulbMsg = {
         testProbe.expectMsgAnyClassOf(5.second, classOf[Failed], Ok.getClass)
@@ -60,7 +57,8 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
 
   }
 
-  "A ButtonActor" must {
+  // TODO the button is only a sensor! when the user physically click it, it sends a message that we should handle
+  /*"A ButtonActor" must {
     "respond properly only to Click" in {
 
       val testProbe = TestProbe()
@@ -91,13 +89,13 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
       sendUnsupportedMsgAndExpectUnsupportedAction(PlayBeep)
       sendUnsupportedMsgAndExpectUnsupportedAction(GetSoundValue)
     }
-  }
+  }*/
 
   "A LightSensorActor" must {
     "respond properly only to GetLightValue" in {
 
       val testProbe = TestProbe()
-      val lightSensor = system.actorOf(LightSensorActor.props("lightSensor1"))
+      val lightSensor = system.actorOf(Props(classOf[LightSensorMockActor]))
 
       def expectAnyValidLightSensorMsg = {
         testProbe.expectMsgAnyClassOf(5.second,
@@ -127,7 +125,8 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
     }
   }
 
-  "A ServoActor" must {
+  // TODO remove, we don't use servos
+  /*"A ServoActor" must {
     "respond properly only to MoveServo" in {
 
       val testProbe = TestProbe()
@@ -158,9 +157,10 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
       sendUnsupportedMsgAndExpectUnsupportedAction(PlayBeep)
       sendUnsupportedMsgAndExpectUnsupportedAction(GetSoundValue)
     }
-  }
+  }*/
 
-  "A SoundSensorActor" must {
+  // TODO remove, we don't use sound sensors
+  /*"A SoundSensorActor" must {
     "respond properly only to GetSoundValue" in {
 
       val testProbe = TestProbe()
@@ -192,9 +192,10 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
       sendUnsupportedMsgAndExpectUnsupportedAction(MoveServo)
       sendUnsupportedMsgAndExpectUnsupportedAction(PlayBeep)
     }
-  }
+  }*/
 
-  "A SpeakerActor" must {
+  // TODO remove, we don't use speakers
+  /*"A SpeakerActor" must {
     "respond properly only to PlayBeep" in {
 
       val testProbe = TestProbe()
@@ -225,9 +226,10 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
       sendUnsupportedMsgAndExpectUnsupportedAction(GetTemperature)
       sendUnsupportedMsgAndExpectUnsupportedAction(MoveServo)
     }
-  }
+  }*/
 
-  "A SwitchActor" must {
+  // TODO remove, we don't use switches
+  /*"A SwitchActor" must {
     "respond properly only to On/Off" in {
 
       val testProbe = TestProbe()
@@ -258,13 +260,13 @@ class DevicesSpec extends PlaySpec with OneAppPerSuite {
       sendUnsupportedMsgAndExpectUnsupportedAction(GetTemperature)
       sendUnsupportedMsgAndExpectUnsupportedAction(MoveServo)
     }
-  }
+  }*/
 
   "A ThermometerActor" must {
     "respond properly only to GetTemperature" in {
 
       val testProbe = TestProbe()
-      val thermometer = system.actorOf(ThermometerActor.props("thermometer1"))
+      val thermometer = system.actorOf(Props(classOf[ThermometerMockActor]))
 
       def expectAnyValidThermometerMsg = {
         testProbe.expectMsgAnyClassOf(5.second,
