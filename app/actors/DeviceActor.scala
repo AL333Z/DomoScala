@@ -1,6 +1,6 @@
 package actors
 
-import akka.actor.{ActorRef, Actor, ActorLogging}
+import akka.actor.{ ActorRef, Actor, ActorLogging }
 import scala.concurrent.duration.Duration
 import play.api.libs.json._
 
@@ -16,7 +16,7 @@ object DeviceActor {
    * status message, since when an actor publish a message on the akka event
    * bus, the sender ActorRef is not preserved.
    */
-  sealed abstract class DeviceStatus(val um:String, val pathName: Option[String] = None)
+  sealed abstract class DeviceStatus(val um: String, val pathName: Option[String] = None)
   object DeviceStatus {
     implicit val baseImplicitWrites = new Writes[DeviceStatus] {
       def writes(devStatus: DeviceStatus): JsValue = devStatus match {
@@ -26,6 +26,11 @@ object DeviceActor {
       }
     }
   }
+
+  /**
+   * Message used to query current device value
+   */
+  case object GetStatus
 
   //////////////////////////////////////////////////////////////////////////////
   ///////////////////////////// Logical values /////////////////////////////////
@@ -56,11 +61,6 @@ object DeviceActor {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Message used to query current light value
-   */
-  case object GetLightValue
-
-  /**
    * Response message, containing actual light value
    */
   case class LightValue(lux: Double,
@@ -85,11 +85,6 @@ object DeviceActor {
   //////////////////////////////////////////////////////////////////////////////
   ///////////////////////////// Temperature ////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Message used to query current temperature value
-   */
-  case object GetTemperature
 
   /**
    * Response message, containing actual temperature value
@@ -142,11 +137,6 @@ object DeviceActor {
   //////////////////////////////////////////////////////////////////////////////
   ///////////////////////////// Sound value ////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Message used to query current sound value
-   */
-  object GetSoundValue
 
   /**
    * Response message, containing actual sound value

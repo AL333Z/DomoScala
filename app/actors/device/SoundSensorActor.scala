@@ -23,7 +23,7 @@ class SoundSensorActor(name: String, meshnetActor: ActorRef, deviceId: Int) exte
   }
 
   def receive = LoggingReceive {
-    case GetSoundValue => sender ! SoundValue(1.0)
+    case GetStatus => sender ! SoundValue(1.0)
     case _ => sender ! UnsupportedAction
   }
 }

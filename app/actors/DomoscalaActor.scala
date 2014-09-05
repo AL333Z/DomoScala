@@ -10,6 +10,11 @@ import play.api.libs.functional.syntax._
 import akka.event.LoggingReceive
 import akka.actor.Props
 import actors.device.ThermometerActor
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
+import scala.concurrent.Future
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 case class Room(id: String, devices: Map[String, ActorRef])
 object Room extends ((String, Map[String, ActorRef]) => Room) {
@@ -39,13 +44,13 @@ object Building extends ((String, Set[Room]) => Building) {
  */
 object DomoscalaActor {
   def props(name: String): Props = Props(classOf[DomoscalaActor], name)
-  
+
   object GetBuildings
   case class GetRooms(buildingId: String)
   case class GetDevices(buildingId: String, roomId: String)
   case class GetDevice(buildingId: String, roomId: String, deviceId: String)
   case class GetDeviceStatus(buildingId: String, roomId: String, deviceId: String)
-  case class SetDevicesStatus(buildingId: String, roomId: String, deviceId: String)
+  case class SetDevicesStatus(buildingId: String, roomId: String, deviceId: String, status: DeviceStatus)
   case class AddBuilding(building: Building)
 }
 
@@ -59,8 +64,8 @@ object DomoscalaActor {
  */
 class DomoscalaActor(name: String) extends Actor with ActorLogging {
 
-  var buildings : Set[Building] = Set()
-
+  var buildings: Set[Building] = Set()
+  implicit val timeout = Timeout(5 seconds)
 
   def receive = LoggingReceive {
 
@@ -82,17 +87,25 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
     case AddBuilding(building) =>
       buildings += building
 
-    //TODO implementation
+    // implementation
     case GetDeviceStatus(buildingId, roomId, deviceId) =>
+      val requestor = sender.actorRef
       getDevice(buildings, buildingId, roomId, deviceId, sender) match {
         case Some(devActorRef) =>
-        case None =>
+          (devActorRef ? GetStatus).mapTo[DeviceStatus].map {
+            case status: DeviceStatus => { requestor ! status }
+          }
+        case None => // doing nothing, a timeout will fire
       }
 
-    case SetDevicesStatus(buildingId, roomId, deviceId) =>
+    case SetDevicesStatus(buildingId, roomId, deviceId, status: DeviceStatus) =>
       getDevice(buildings, buildingId, roomId, deviceId, sender) match {
-        case Some(devActorRef) =>
-        case None =>
+        case Some(devActorRef) => (devActorRef.asInstanceOf[ActorRef] ? GetStatus).map {
+          case LightValue(lux, _) =>
+          case _ => Failed
+        }
+        case None => Failed(new Throwable(s"No devices with deviceId $deviceId " +
+          "in Building $buildingId, room $roomId"))
       }
 
     case _ => sender ! UnsupportedAction
