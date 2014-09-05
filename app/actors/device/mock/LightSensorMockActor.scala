@@ -21,7 +21,7 @@ class LightSensorMockActor extends Actor {
   def receive = {
     case SendLight =>
       Akka.system.eventStream.publish(LightValue(fakeLight, Some(self.path.name)))
-    case GetLightValue =>
+    case GetStatus =>
       sender ! LightValue(fakeLight)
     case _ => sender ! UnsupportedAction
   }

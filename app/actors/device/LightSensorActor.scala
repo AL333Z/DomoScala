@@ -24,7 +24,7 @@ class LightSensorActor(name: String, meshnetActor: ActorRef, deviceId: Int) exte
   var currLight: Option[Double] = None
 
   def receive = LoggingReceive {
-    case GetLightValue => currLight.foreach(sender ! LightValue(_))
+    case GetStatus => currLight.foreach(sender ! LightValue(_))
     case AskLightValue => askLightToDevice()
     case msg: FromDeviceMessage =>
     case _ => sender ! UnsupportedAction

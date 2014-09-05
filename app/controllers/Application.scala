@@ -112,7 +112,17 @@ object Application extends Controller {
     }
   }
 
-  def getDeviceStatus(buildingId: String, roomId: String, deviceId: String) = TODO
+  def getDeviceStatus(buildingId: String, roomId: String, deviceId: String) = Action.async {
+    val timeoutFuture = getTimeoutFuture
+    val deviceStatusFuture = getDeviceStatusFuture(buildingId, roomId, deviceId)
+    Future.firstCompletedOf(Seq(deviceStatusFuture, timeoutFuture)).map {
+      case res: DeviceStatus => Ok(Json.obj(
+        "status" -> "OK",
+        "deviceStatus" -> res))
+      case Failed(err) => BadRequest(err.getMessage)
+      case t: String => InternalServerError(t)
+    }
+  }
 
   def setDevicesStatus(buildingId: String, roomId: String, deviceId: String) = TODO
 
@@ -130,4 +140,9 @@ object Application extends Controller {
   def getDevicesFuture(buildingId: String, roomId: String): Future[Map[String, ActorRef]] =
     (domo ? GetDevices(buildingId, roomId)).mapTo[Map[String, ActorRef]]
 
+  def getDeviceFuture(buildingId: String, roomId: String, deviceId: String): Future[ActorRef] =
+    (domo ? GetDevice(buildingId, roomId, deviceId)).mapTo[ActorRef]
+
+  def getDeviceStatusFuture(buildingId: String, roomId: String, deviceId: String): Future[DeviceStatus] =
+    (domo ? GetDeviceStatus(buildingId, roomId, deviceId)).mapTo[DeviceStatus]
 }
