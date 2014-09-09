@@ -64,8 +64,6 @@ object Application extends Controller {
       }
     }
 
-  //RoomStatusWebSocketActor
-
   def reqPushDeviceStatus(buildingId: String, roomId: String, deviceId: String) =
     WebSocket.acceptWithActor[String, JsValue] { request =>
       out => {
@@ -82,7 +80,7 @@ object Application extends Controller {
         "status" -> "OK",
         "buildings" -> res.asInstanceOf[Set[Building]]))
       case Failed(err) => BadRequest(err.getMessage)
-      case t: String => InternalServerError(t)
+      case t: Throwable => InternalServerError(t.getMessage)
     }
   }
 
@@ -94,7 +92,7 @@ object Application extends Controller {
         "status" -> "OK",
         "rooms" -> res.asInstanceOf[Set[Room]]))
       case Failed(err) => BadRequest(err.getMessage)
-      case t: String => InternalServerError(t)
+      case t: Throwable => InternalServerError(t.getMessage)
     }
   }
 
@@ -108,7 +106,7 @@ object Application extends Controller {
           case (id, actor) => (id, actor.path.toString)
         }))
       case Failed(err) => BadRequest(err.getMessage)
-      case t: String => InternalServerError(t)
+      case t: Throwable => InternalServerError(t.getMessage)
     }
   }
 
@@ -120,16 +118,40 @@ object Application extends Controller {
         "status" -> "OK",
         "deviceStatus" -> res))
       case Failed(err) => BadRequest(err.getMessage)
-      case t: String => InternalServerError(t)
+      case t: Throwable => InternalServerError(t.getMessage)
     }
   }
 
-  def setDevicesStatus(buildingId: String, roomId: String, deviceId: String) = TODO
+  def setDevicesStatus(buildingId: String, roomId: String, deviceId: String) =
+    Action.async(parse.json) { implicit request =>
+      request.body.validate[DeviceStatus] match {
+        case s: JsSuccess[DeviceStatus] => {
+          val status: DeviceStatus = s.get
+
+          // do something with place
+          Logger.debug("Received device status: um: " + status.um + " value:" + status.value +
+            " for device with id: " + deviceId +
+            " in room: " + roomId +
+            " in building: " + buildingId)
+
+          val timeoutFuture = getTimeoutFuture
+          val deviceStatusFuture = setDeviceStatusFuture(buildingId, roomId, deviceId, status)
+          Future.firstCompletedOf(Seq(deviceStatusFuture, timeoutFuture)).map {
+            case t: Throwable => InternalServerError(t.getMessage)
+            case _ => Ok(Json.obj("status" -> "OK"))
+          }
+        }
+        case e: JsError => {
+          // error handling flow
+          Future { BadRequest("Invalid Json payload.\n Error: " + e.errors) }
+        }
+      }
+    }
 
   /**
    * Utilities, to get futures
    */
-  def getTimeoutFuture = Promise.timeout("Timeout elapsed.", 5.second)
+  def getTimeoutFuture = Promise.timeout(new Throwable("Timeout elapsed."), 5.second)
 
   def getBuildingFuture: Future[Set[Building]] =
     (domo ? GetBuildings).mapTo[Set[Building]]
@@ -145,4 +167,10 @@ object Application extends Controller {
 
   def getDeviceStatusFuture(buildingId: String, roomId: String, deviceId: String): Future[DeviceStatus] =
     (domo ? GetDeviceStatus(buildingId, roomId, deviceId)).mapTo[DeviceStatus]
+
+  def setDeviceStatusFuture(buildingId: String, roomId: String, deviceId: String,
+    status: DeviceStatus) = Future {
+    // send command, with 'fire and forget' semantic
+    domo ! SetDeviceStatus(buildingId, roomId, deviceId, status)
+  }
 }

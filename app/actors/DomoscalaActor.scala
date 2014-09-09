@@ -50,7 +50,7 @@ object DomoscalaActor {
   case class GetDevices(buildingId: String, roomId: String)
   case class GetDevice(buildingId: String, roomId: String, deviceId: String)
   case class GetDeviceStatus(buildingId: String, roomId: String, deviceId: String)
-  case class SetDevicesStatus(buildingId: String, roomId: String, deviceId: String, status: DeviceStatus)
+  case class SetDeviceStatus(buildingId: String, roomId: String, deviceId: String, status: DeviceStatus)
   case class AddBuilding(building: Building)
 }
 
@@ -90,7 +90,7 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
     // implementation
     case GetDeviceStatus(buildingId, roomId, deviceId) =>
       val requestor = sender.actorRef
-      getDevice(buildings, buildingId, roomId, deviceId, sender) match {
+      getDevice(buildings, buildingId, roomId, deviceId, requestor) match {
         case Some(devActorRef) =>
           (devActorRef ? GetStatus).mapTo[DeviceStatus].map {
             case status: DeviceStatus => { requestor ! status }
@@ -98,14 +98,13 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
         case None => // doing nothing, a timeout will fire
       }
 
-    case SetDevicesStatus(buildingId, roomId, deviceId, status: DeviceStatus) =>
-      getDevice(buildings, buildingId, roomId, deviceId, sender) match {
-        case Some(devActorRef) => (devActorRef.asInstanceOf[ActorRef] ? GetStatus).map {
-          case LightValue(lux, _) =>
-          case _ => Failed
-        }
-        case None => Failed(new Throwable(s"No devices with deviceId $deviceId " +
-          "in Building $buildingId, room $roomId"))
+    case SetDeviceStatus(buildingId, roomId, deviceId, status: DeviceStatus) =>
+      val requestor = sender.actorRef
+      getDevice(buildings, buildingId, roomId, deviceId, requestor) match {
+        case Some(devActorRef) =>
+          println("status " + status.value)
+          (devActorRef ? status).mapTo[Any]
+        case None => // doing nothing, a timeout will fire
       }
 
     case _ => sender ! UnsupportedAction

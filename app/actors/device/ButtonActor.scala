@@ -1,8 +1,8 @@
 package actors.device
 
 import actors.DeviceActor._
-import actors.MeshnetBase.{FromDeviceMessage, SubscribeToMessagesFromDevice}
-import akka.actor.{ActorRef, Props, actorRef2Scala}
+import actors.MeshnetBase.{ FromDeviceMessage, SubscribeToMessagesFromDevice }
+import akka.actor.{ ActorRef, Props, actorRef2Scala }
 import actors.DeviceActor
 import akka.event.LoggingReceive
 import play.libs.Akka
@@ -13,7 +13,7 @@ object ButtonActor {
 
 class ButtonActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends DeviceActor(name, meshnetActor, deviceId) {
 
-  override def preStart(){
+  override def preStart {
     meshnetActor ! SubscribeToMessagesFromDevice(deviceId)
   }
 
@@ -22,11 +22,11 @@ class ButtonActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends D
     case _ => sender ! UnsupportedAction
   }
 
-  def parseFromDeviceMessage(msg: FromDeviceMessage){
-    if(msg.command == 5){
+  def parseFromDeviceMessage(msg: FromDeviceMessage) {
+    if (msg.command == 5) {
       // TODO what Akka message should I send to the event stream when the button is pressed?
-      //Akka.system.eventStream.publish()
-      println("button pressed!")
+      //Akka.system.eventStream.publish() somewhere?
+      log.debug("button pressed!")
     }
   }
 }

@@ -8,23 +8,31 @@ import scala.util.Random
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.Play.current
 import actors.DeviceActor._
+import akka.actor.Props
+import actors.device.ThermometerActor
+import actors.MeshnetBase._
+import java.nio.ByteBuffer
 
-class ThermometerMockActor extends Actor {
+object ThermometerMockActor {
+  def props(name: String): Props = Props(classOf[ThermometerMockActor], name)
+}
 
+class ThermometerMockActor(name: String) extends ThermometerActor(name, null, -1) {
+
+  // mock actor avoids interaction with hw
   override def preStart = {
-    Akka.system.scheduler.schedule(2 seconds, 3 seconds, self, SendTemp) // periodically send fake temperature reading
+    // periodically ask temp value to the device
+    Akka.system.scheduler.schedule(3 seconds, 3 seconds, self, RefreshStatus)
   }
 
-  case object SendTemp
-
-  def receive = {
-    case SendTemp =>
-      Akka.system.eventStream.publish(TemperatureValue(fakeTemp, Some(self.path.name)))
-    case GetStatus =>
-      sender ! TemperatureValue(fakeTemp)
-    case _ => sender ! UnsupportedAction
+  override def askTemperatureToDevice = {
+    // instead of querying the device, create a response directly
+    self ! FromDeviceMessage(-1, -1, null)
   }
 
-  def fakeTemp = 10 + (Random.nextDouble() * 20)
-
+  override def parseFromDeviceMessage(msg: FromDeviceMessage): Double = {
+    // given a response from the device, return read value (since we are just 
+    // mocking, only returning a random value is enough)
+    10.0f + (Random.nextDouble() * 20)
+  }
 }

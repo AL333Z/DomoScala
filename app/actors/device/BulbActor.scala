@@ -2,7 +2,7 @@ package actors.device
 
 import actors.DeviceActor._
 import actors.MeshnetBase.ToDeviceMessage
-import akka.actor.{ActorRef, Props, actorRef2Scala}
+import akka.actor.{ ActorRef, Props, actorRef2Scala }
 import actors.DeviceActor
 import akka.event.LoggingReceive
 import play.libs.Akka
@@ -15,47 +15,42 @@ object BulbActor {
 
 class BulbActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends DeviceActor(name, meshnetActor, deviceId) {
 
-  var isLampOn = false
-  var intensityValue = 188 // this is a 8 bit PWM value, ranging from 0 to 255
+  // intensity is a 8 bit PWM value, ranging from 0 to 255
+  val offIntensityValue = 0
+  val onIntensityValue = 255
+  val meshnetCommand = 2
 
+  // when starting, all devices are off
+  def receive = LoggingReceive { main(offIntensityValue) }
 
-  override def preStart() = {
-    // test code to blink lights :)
-    Akka.system.scheduler.schedule(1 seconds, 2 seconds, self, On)
-    Akka.system.scheduler.schedule(2 seconds, 2 seconds, self, Off)
-  }
-
-
-  def receive = LoggingReceive {
-    case On => {
-      isLampOn = true
-      setPwmValue(intensityValue)
-      sender ! Ok
-    }
-    case Off => {
-      isLampOn = false
-      setPwmValue(0) // switch off lamp
-      sender ! Ok
-    }
-    case SetActivationValue(value) => value match {
-      case value if (value < 0.0 || value > 1.0) =>
+  def main(intensityValue: Int): Receive = {
+    case ds: DeviceStatus => {
+      val actValue = ds
+      if (actValue.value < 0.0 || actValue.value > 1.0) {
         sender ! Failed(new Exception("Value out of valid range [0.0 ... 1.0]!"))
-      case value =>
-        intensityValue = (value * 255).toInt
-        isLampOn = true
-        setPwmValue(intensityValue)
+      } else {
+        val newIntensityValue = (actValue.value * 255).toInt
+        setPwmValue(newIntensityValue)
+        log.debug("set new value " + newIntensityValue)
+
+        // publish new value
+        Akka.system.eventStream.publish(ActivationValue(newIntensityValue, Some(self.path.name)))
+        log.debug("received new activation value and now publishing: " + newIntensityValue)
+
+        context.become(main(newIntensityValue))
         sender ! Ok
+      }
     }
+    case GetStatus => sender ! new ActivationValue(intensityValue / 255.0f)
     case _ => sender ! UnsupportedAction
   }
-
-
-  val meshnetCommand = 2
 
   /**
    * This makes a low-level Meshnet message to be sent to the device
    */
   def setPwmValue(pwmValue: Int) = {
-    meshnetActor ! ToDeviceMessage(deviceId, meshnetCommand, Array[Byte]((pwmValue-128).toByte))
+    //TODO find a better way to convert data to Java sh*t Byte stuff
+    println("Sending command to meshnet..")
+    meshnetActor ! ToDeviceMessage(deviceId, meshnetCommand, Array[Byte]((pwmValue - 128).toByte))
   }
 }

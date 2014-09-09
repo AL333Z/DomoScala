@@ -6,20 +6,13 @@ import play.api.libs.concurrent.Akka
 import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.Play.current
+import akka.actor.Props
+import actors.device.ButtonActor
 
+object ButtonMockActor {
+  def props(name: String): Props = Props(classOf[ButtonMockActor], name)
+}
 
-class ButtonMockActor extends Actor {
-
-  override def preStart = {
-    Akka.system.scheduler.schedule(2 seconds, 4 seconds, self, SendClick) // periodically send fake temperature reading
-  }
-
-  case object SendClick
-
-  def receive = {
-    case SendClick =>
-      // TODO what Akka message should I send to the event stream when the button is pressed?
-      println("mock button virtually clicked")
-    case _ => sender ! UnsupportedAction
-  }
+class ButtonMockActor(name: String) extends ButtonActor(name, null, -1) {
+  override def preStart = {}
 }

@@ -3,10 +3,10 @@ package actors
 import java.nio.ByteBuffer
 
 import actors.DomoscalaActor.AddBuilding
-import actors.MeshnetBase.{DeviceNotConnected, FromDeviceMessage, SubscribeToMessagesFromDevice, ToDeviceMessage}
-import actors.device.{ButtonActor, LightSensorActor, ThermometerActor, BulbActor}
-import akka.actor.{ActorRef, Actor, ActorLogging, Props}
-import com.mattibal.meshnet.devices.{LedTestDevice, Led1Analog2Device}
+import actors.MeshnetBase.{ DeviceNotConnected, FromDeviceMessage, SubscribeToMessagesFromDevice, ToDeviceMessage }
+import actors.device.{ ButtonActor, LightSensorActor, ThermometerActor, BulbActor }
+import akka.actor.{ ActorRef, Actor, ActorLogging, Props }
+import com.mattibal.meshnet.devices.{ LedTestDevice, Led1Analog2Device }
 import com.mattibal.meshnet.{ Device, SerialRXTXComm, Layer3Base }
 import gnu.io._
 import scala.collection.JavaConversions._
@@ -14,7 +14,6 @@ import play.Logger
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
-
 
 object MeshnetBase {
 
@@ -49,7 +48,6 @@ object MeshnetBase {
     }
   }
 
-
   // A message that can be sent to a MeshNet device. All real messages should extend from this.
   case class ToDeviceMessage(destinationId: Int, command: Int, data: Array[Byte])
 
@@ -68,9 +66,6 @@ object MeshnetBase {
   case class DeviceNotConnected(deviceId: Int)
 
 }
-
-
-
 
 /**
  * This actor represent a MeshNet base, something capable of running a JVM (for
@@ -98,7 +93,6 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
     createActorsFromDiscoveredDevices()
   }
 
-
   def receive = {
 
     case ToDeviceMessage(destinationId, command, data) => {
@@ -118,12 +112,11 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
       }
     }
 
-    case msg : FromDeviceMessage => {
+    case msg: FromDeviceMessage => {
       val subscribers = subscribedActors.get(msg.sourceDevId)
       subscribers.foreach(_.foreach(_ ! msg))
     }
   }
-
 
   /**
    * Callback from the Meshnet Java library thread, so I just send myself a message to avoid threading issues
@@ -132,26 +125,23 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
     context.self ! FromDeviceMessage(deviceId, command, data.array())
   }
 
-
-
   /**
    * A "scalification" of the legacy Java method...
    *
    * Use this instead of Device.getDeviceFromUniqueId()
    */
-  def getDeviceFromUniqueId(deviceId: Int) : Option[Device] = {
+  def getDeviceFromUniqueId(deviceId: Int): Option[Device] = {
     Device.getDeviceFromUniqueId(deviceId) match {
       case null => None
       case device: Device => Some(device)
     }
   }
 
-
   def createActorsFromDiscoveredDevices() {
     val devices = Device.getKnownDevices
     val rooms = devices.map(
       _ match {
-        case device: Led1Analog2Device => {   // this is our battery-powered wireless test circuit
+        case device: Led1Analog2Device => { // this is our battery-powered wireless test circuit
           val devId = device.getUniqueId
           val bulb = context.actorOf(BulbActor.props("Bulb1", self, devId), "Bulb1")
           val temp = context.actorOf(ThermometerActor.props("Thermometer0", self, devId), "Thermometer0")
@@ -159,15 +149,14 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
           Room("Room1", Map("Bulb1" -> bulb, "Thermometer0" -> temp, "LightSensor0" -> light))
         }
 
-        case device: Device => {       // this is our Arduino shield connected with USB to the computer (Meshnet base)
+        case device: Device => { // this is our Arduino shield connected with USB to the computer (Meshnet base)
           val devId = device.getUniqueId
           val bulb = context.actorOf(BulbActor.props("Bulb0", self, devId), "Bulb0")
           val button = context.actorOf(ButtonActor.props("Button0", self, devId), "Button0")
           Room("Room0", Map("Bulb0" -> bulb, "Button0" -> button))
         }
-      }
-    )
-    val building = Building("Building0", Set()++rooms) // ++ needed to convert from mutable to immutable Set
+      })
+    val building = Building("Building0", Set() ++ rooms) // ++ needed to convert from mutable to immutable Set
     domoscalaActor ! AddBuilding(building)
   }
 }

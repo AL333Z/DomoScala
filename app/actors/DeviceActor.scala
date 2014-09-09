@@ -3,6 +3,8 @@ package actors
 import akka.actor.{ ActorRef, Actor, ActorLogging }
 import scala.concurrent.duration.Duration
 import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 
 /**
  * This object contains all the messages that can be exchanged between an actor
@@ -16,19 +18,36 @@ object DeviceActor {
    * status message, since when an actor publish a message on the akka event
    * bus, the sender ActorRef is not preserved.
    */
-  sealed abstract class DeviceStatus(val um: String, val pathName: Option[String] = None)
+  sealed abstract class AbstractDeviceStatus(val value: Double, val um: String, val pathName: Option[String] = None)
+  class DeviceStatus(override val value: Double, override val um: String, override val pathName: Option[String] = None) extends AbstractDeviceStatus(value, um, pathName)
+
   object DeviceStatus {
     implicit val baseImplicitWrites = new Writes[DeviceStatus] {
       def writes(devStatus: DeviceStatus): JsValue = devStatus match {
-        case s: LightValue => LightValue.writes.writes(s)
-        case s: TemperatureValue => TemperatureValue.writes.writes(s)
-        case s: SoundValue => SoundValue.writes.writes(s)
+        case s: LightValue => LightValue.writes(s)
+        case s: TemperatureValue => TemperatureValue.writes(s)
+        case s: SoundValue => SoundValue.writes(s)
+        case s: ActivationValue => ActivationValue.writes(s)
       }
     }
+
+    implicit val reads: Reads[DeviceStatus] = (
+      (JsPath \ "value").read[Double] ~
+      (JsPath \ "um").read[String] ~
+      (JsPath \ "pathName").readNullable[String])((value: Double, um: String, pathName: Option[String]) =>
+        new DeviceStatus(value, um, pathName))
   }
 
   /**
-   * Message used to query current device value
+   * Message used to force refresh current device value, that may not be the most
+   * updated. Sending RefreshStatus and then GetStatus guarantees that returned
+   * value is up to date.
+   */
+  case object RefreshStatus
+
+  /**
+   * Message used to query current device value, that may not be the most
+   * updated
    */
   case object GetStatus
 
@@ -37,22 +56,17 @@ object DeviceActor {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Generic class, used to set different logic values
+   * Class used to set different logic values
    */
-  sealed abstract class SetActivation(value: Double)
-
-  /**
-   * Message used to set On logic values
-   */
-  case object On extends SetActivation(1.0)
-
-  /**
-   * Message used to set Off logic values
-   */
-  case object Off extends SetActivation(0.0)
-  case class SetActivationValue(value: Double) extends SetActivation(value) {
+  case class ActivationValue(override val value: Double, override val pathName: Option[String] = None) extends DeviceStatus(value, "doubleValue", pathName) {
     override def equals(obj: Any) = {
-      this.value == obj.asInstanceOf[SetActivationValue].value
+      this.value == obj.asInstanceOf[ActivationValue].value
+    }
+  }
+
+  object ActivationValue {
+    def writes(activationValue: ActivationValue): JsValue = {
+      Json.obj("value" -> activationValue.value, "um" -> activationValue.um)
     }
   }
 
@@ -63,11 +77,11 @@ object DeviceActor {
   /**
    * Response message, containing actual light value
    */
-  case class LightValue(lux: Double,
-    override val pathName: Option[String] = None) extends DeviceStatus("lux", pathName) {
+  case class LightValue(override val value: Double,
+    override val pathName: Option[String] = None) extends DeviceStatus(value, "lux", pathName) {
 
     override def equals(obj: Any) = {
-      this.lux == obj.asInstanceOf[LightValue].lux
+      this.value == obj.asInstanceOf[LightValue].value
     }
   }
 
@@ -75,10 +89,8 @@ object DeviceActor {
    * Companion object of LightValue
    */
   object LightValue {
-    val writes = new Writes[LightValue] {
-      def writes(lightValue: LightValue): JsValue = {
-        Json.obj("value" -> lightValue.lux)
-      }
+    def writes(lightValue: LightValue): JsValue = {
+      Json.obj("value" -> lightValue.value, "um" -> lightValue.um)
     }
   }
 
@@ -89,11 +101,11 @@ object DeviceActor {
   /**
    * Response message, containing actual temperature value
    */
-  case class TemperatureValue(celsiusTemp: Double,
-    override val pathName: Option[String] = None) extends DeviceStatus("celsius", pathName) {
+  case class TemperatureValue(override val value: Double,
+    override val pathName: Option[String] = None) extends DeviceStatus(value, "celsius", pathName) {
 
     override def equals(obj: Any) = {
-      this.celsiusTemp == obj.asInstanceOf[TemperatureValue].celsiusTemp
+      this.value == obj.asInstanceOf[TemperatureValue].value
     }
   }
 
@@ -101,36 +113,8 @@ object DeviceActor {
    * Companion object of Temperature
    */
   object TemperatureValue {
-    val writes = new Writes[TemperatureValue] {
-      def writes(temp: TemperatureValue): JsValue = {
-        Json.obj("value" -> temp.celsiusTemp)
-      }
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////// Servo //////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Message used to fire servo movement
-   */
-  case class MoveServo(degrees: Double) {
-    override def equals(obj: Any) = {
-      this.degrees == obj.asInstanceOf[MoveServo].degrees
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////// Beep ///////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Message used to play a beep
-   */
-  case class PlayBeep(duration: Duration) {
-    override def equals(obj: Any) = {
-      this.duration == obj.asInstanceOf[PlayBeep].duration
+    def writes(temp: TemperatureValue): JsValue = {
+      Json.obj("value" -> temp.value, "um" -> temp.um)
     }
   }
 
@@ -141,11 +125,11 @@ object DeviceActor {
   /**
    * Response message, containing actual sound value
    */
-  case class SoundValue(decibels: Double,
-    override val pathName: Option[String] = None) extends DeviceStatus("decibels", pathName) {
+  case class SoundValue(override val value: Double,
+    override val pathName: Option[String] = None) extends DeviceStatus(value, "decibels", pathName) {
 
     override def equals(obj: Any) = {
-      this.decibels == obj.asInstanceOf[SoundValue].decibels
+      this.value == obj.asInstanceOf[SoundValue].value
     }
   }
 
@@ -153,38 +137,27 @@ object DeviceActor {
    * Companion object of SoundValue
    */
   object SoundValue {
-    val writes = new Writes[SoundValue] {
-      def writes(soundValue: SoundValue): JsValue = {
-        Json.obj("value" -> soundValue.decibels)
-      }
+    def writes(soundValue: SoundValue): JsValue = {
+      Json.obj("value" -> soundValue.value, "um" -> soundValue.um)
     }
   }
-
-  //////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////// Click //////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Message sent by a button when it's clicked
-   */
-  case object Click // from button
 
   //////////////////////////////////////////////////////////////////////////////
   ///////////////////////////// Simple Results /////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Response messege, returned when requested action is not supported
+   * Response message, returned when requested action is not supported
    */
   case object UnsupportedAction
 
   /**
-   * Response messege, returned when requested action has been completed
+   * Response message, returned when requested action has been completed
    */
   case object Ok
 
   /**
-   * Response messege, returned when requested action did failed
+   * Response message, returned when requested action did failed
    */
   case class Failed(error: Throwable) {
     override def equals(obj: Any) = {
