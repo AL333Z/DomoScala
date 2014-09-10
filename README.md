@@ -36,10 +36,10 @@ The system consists of:
 * one or more **Arduino** (or other kind of circuits), that interact with the server
 * one or more **clients** app (frontend app, android app, ...)
 
-Arduino
+Hardware devices
 ----------
-Arduino is used to simulate an home automation system, with its **sensor** and **actuator** devices.
-**[Meshnet lib](https://github.com/mattibal/meshnet)** is used to build a [mesh net](http://en.wikipedia.org/wiki/Mesh_networking) of devices. This approach extends the total range of the network and allows devices to comunicate with each other without the need of a Wifi access point near each device.
+Arduino and some custom boards are used to make a small home automation system, composed of many devices each with many **sensors** and **actuators** attached.
+**[Meshnet](https://github.com/mattibal/meshnet)** library is used to build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices that you can put around your home. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. 
 
 API
 -----
