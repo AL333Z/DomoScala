@@ -51,6 +51,6 @@ class BulbActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Dev
   def setPwmValue(pwmValue: Int) = {
     //TODO find a better way to convert data to Java sh*t Byte stuff
     println("Sending command to meshnet..")
-    meshnetActor ! ToDeviceMessage(deviceId, meshnetCommand, Array[Byte]((pwmValue - 128).toByte))
+    meshnetActor ! ToDeviceMessage(deviceId, meshnetCommand, Array[Byte]((pwmValue).toByte))
   }
 }
