@@ -6,6 +6,8 @@ import akka.actor.Props
 import play.api.Play.current
 import play.api._
 import play.api.libs.concurrent.Akka
+import actors.Dev
+import actors.DeviceActor
 
 object Global extends GlobalSettings {
 
@@ -30,15 +32,16 @@ object Global extends GlobalSettings {
 
       // Create mock device actors
 
-      val bulb0 = Akka.system.actorOf(BulbMockActor.props("Bulb0"))
-      val button0 = Akka.system.actorOf(ButtonMockActor.props("Button0"))
-      val room0 = Room("Room0", Map("Bulb0" -> bulb0, "Button0" -> button0))
+      val bulb0 = Dev("Bulb0", DeviceActor.bulbType, Akka.system.actorOf(BulbMockActor.props("Bulb0")))
+      val button0 = Dev("Button0", DeviceActor.buttonType, Akka.system.actorOf(ButtonMockActor.props("Button0")))
 
-      val bulb1 = Akka.system.actorOf(BulbMockActor.props("Bulb1"))
-      val temp = Akka.system.actorOf(ThermometerMockActor.props("Thermometer0"))
-      val light = Akka.system.actorOf(LightSensorMockActor.props("LightSensor0"))
+      val room0 = Room("Room0", Set(bulb0, button0))
 
-      val room1 = Room("Room1", Map("Bulb1" -> bulb1, "Thermometer0" -> temp, "LightSensor0" -> light))
+      val bulb1 = Dev("Bulb1", DeviceActor.bulbType, Akka.system.actorOf(BulbMockActor.props("Bulb1")))
+      val temp = Dev("Thermometer0", DeviceActor.tempType, Akka.system.actorOf(ThermometerMockActor.props("Thermometer0")))
+      val light = Dev("LightSensor0", DeviceActor.lightType, Akka.system.actorOf(LightSensorMockActor.props("LightSensor0")))
+
+      val room1 = Room("Room1", Set(bulb1, temp, light))
 
       val building = Building("Building0", Set(room0, room1))
       domoscalaActor ! AddBuilding(building)

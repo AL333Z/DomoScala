@@ -165,6 +165,12 @@ object DeviceActor {
       this.error.getMessage == that.error.getMessage
     }
   }
+
+  val bulbType = "bulb"
+  val tempType = "temp"
+  val lightType = "light"
+  val buttonType = "button"
+
 }
 
 abstract class DeviceActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Actor with ActorLogging

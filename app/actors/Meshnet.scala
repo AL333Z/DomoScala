@@ -1,7 +1,6 @@
 package actors
 
 import java.nio.ByteBuffer
-
 import actors.DomoscalaActor.AddBuilding
 import actors.MeshnetBase.{ DeviceNotConnected, FromDeviceMessage, SubscribeToMessagesFromDevice, ToDeviceMessage }
 import actors.device.{ ButtonActor, LightSensorActor, ThermometerActor, BulbActor }
@@ -143,17 +142,17 @@ class MeshnetBase(port: CommPortIdentifier, domoscalaActor: ActorRef) extends Ac
       _ match {
         case device: Led1Analog2Device => { // this is our battery-powered wireless test circuit
           val devId = device.getUniqueId
-          val bulb = context.actorOf(BulbActor.props("Bulb1", self, devId), "Bulb1")
-          val temp = context.actorOf(ThermometerActor.props("Thermometer0", self, devId), "Thermometer0")
-          val light = context.actorOf(LightSensorActor.props("LightSensor0", self, devId), "LightSensor0")
-          Room("Room1", Map("Bulb1" -> bulb, "Thermometer0" -> temp, "LightSensor0" -> light))
+          val bulb = Dev("Bulb1", DeviceActor.bulbType, context.actorOf(BulbActor.props("Bulb1", self, devId), "Bulb1"))
+          val temp = Dev("Thermometer0", DeviceActor.tempType, context.actorOf(ThermometerActor.props("Thermometer0", self, devId), "Thermometer0"))
+          val light = Dev("LightSensor0", DeviceActor.lightType, context.actorOf(LightSensorActor.props("LightSensor0", self, devId), "LightSensor0"))
+          Room("Room1", Set(bulb, temp, light))
         }
 
         case device: Device => { // this is our Arduino shield connected with USB to the computer (Meshnet base)
           val devId = device.getUniqueId
-          val bulb = context.actorOf(BulbActor.props("Bulb0", self, devId), "Bulb0")
-          val button = context.actorOf(ButtonActor.props("Button0", self, devId), "Button0")
-          Room("Room0", Map("Bulb0" -> bulb, "Button0" -> button))
+          val bulb = Dev("Bulb0", DeviceActor.bulbType, context.actorOf(BulbActor.props("Bulb0", self, devId), "Bulb0"))
+          val button = Dev("Button0", DeviceActor.buttonType, context.actorOf(ButtonActor.props("Button0", self, devId), "Button0"))
+          Room("Room0", Set(bulb, button))
         }
       })
     val building = Building("Building0", Set() ++ rooms) // ++ needed to convert from mutable to immutable Set

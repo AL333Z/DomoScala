@@ -16,15 +16,23 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-case class Room(id: String, devices: Map[String, ActorRef])
-object Room extends ((String, Map[String, ActorRef]) => Room) {
+case class Dev(val id: String, val devType: String, actorRef: ActorRef)
+object Dev extends ((String, String, ActorRef) => Dev) {
+  // implicit Json serializer
+  implicit val DevieToJson: Writes[Dev] = (
+    (__ \ "id").write[String] ~ (__ \ "devType").write[String]) {
+      (device: Dev) =>
+        (device.id, device.devType)
+    }
+}
+
+case class Room(id: String, devices: Set[Dev])
+object Room extends ((String, Set[Dev]) => Room) {
 
   // implicit Json serializer
   implicit val RoomToJson: Writes[Room] = (
-    (__ \ "id").write[String] ~ (__ \ "devices").write[Map[String, String]]) {
-      (room: Room) =>
-        (room.id,
-          room.devices.map { case (id, actor) => (id, actor.path.toString) })
+    (__ \ "id").write[String] ~ (__ \ "devices").write[Set[Dev]]) {
+      (room: Room) => (room.id, room.devices)
     }
 }
 
@@ -79,8 +87,8 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
 
     case GetDevice(buildingId, roomId, deviceId) =>
       getDevice(buildings, buildingId, roomId, deviceId, sender) match {
-        case Some(devActorRef) =>
-          sender ! devActorRef
+        case Some(dev) =>
+          sender ! dev
         case None =>
       }
 
@@ -91,8 +99,8 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
     case GetDeviceStatus(buildingId, roomId, deviceId) =>
       val requestor = sender.actorRef
       getDevice(buildings, buildingId, roomId, deviceId, requestor) match {
-        case Some(devActorRef) =>
-          (devActorRef ? GetStatus).mapTo[DeviceStatus].map {
+        case Some(device) =>
+          (device.actorRef ? GetStatus).mapTo[DeviceStatus].map {
             case status: DeviceStatus => { requestor ! status }
           }
         case None => // doing nothing, a timeout will fire
@@ -101,9 +109,8 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
     case SetDeviceStatus(buildingId, roomId, deviceId, status: DeviceStatus) =>
       val requestor = sender.actorRef
       getDevice(buildings, buildingId, roomId, deviceId, requestor) match {
-        case Some(devActorRef) =>
-          println("status " + status.value)
-          (devActorRef ? status).mapTo[Any]
+        case Some(device) =>
+          (device.actorRef ? status).mapTo[Any]
         case None => // doing nothing, a timeout will fire
       }
 
@@ -130,7 +137,7 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
   }
 
   def getDevices(buildings: Set[Building], buildingId: String, roomId: String,
-    sender: ActorRef): Option[Map[String, ActorRef]] = {
+    sender: ActorRef): Option[Set[Dev]] = {
 
     getRooms(buildings, buildingId, sender) match {
       case Some(rooms) => rooms.filter(_.id == roomId).toList match {
@@ -149,16 +156,16 @@ class DomoscalaActor(name: String) extends Actor with ActorLogging {
   }
 
   def getDevice(buildings: Set[Building], buildingId: String, roomId: String,
-    deviceId: String, sender: ActorRef): Option[ActorRef] = {
+    deviceId: String, sender: ActorRef): Option[Dev] = {
 
     getDevices(buildings, buildingId, roomId, sender) match {
-      case Some(devicesMap) => devicesMap.get(deviceId) match {
-        case Some(devActorRef) => Some(devActorRef)
-        case None => {
+      case Some(devicesSet) =>
+        if (!devicesSet.filter(_.id == deviceId).isEmpty) {
+          Some(devicesSet.filter(_.id == deviceId).head)
+        } else {
           sender ! Failed(new Throwable("No device with given device id."))
           None
         }
-      }
       case None => None
     }
   }

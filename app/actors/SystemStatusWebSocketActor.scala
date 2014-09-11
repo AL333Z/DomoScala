@@ -21,6 +21,7 @@ class SystemStatusWebSocketActor(out: ActorRef) extends Actor with ActorLogging 
   override def preStart() = {
     // look for our "root" actor, and get buildings
     val domo = Akka.system.actorSelection("user/domoscala")
+    println("pre-start building.")
     domo ! GetBuildings
   }
 

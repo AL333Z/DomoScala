@@ -26,10 +26,10 @@ class RoomStatusWebSocketActor(out: ActorRef, buildingId: String,
   }
 
   def init: Receive = LoggingReceive {
-    case devices: Map[_, _] =>
-      devices.asInstanceOf[Map[String, ActorRef]].map {
-        case (id, actor) =>
-          context.actorOf(DeviceStatusWebSocketActor.props(self, buildingId, roomId, id))
+    case devices: Set[_] =>
+      devices.asInstanceOf[Set[Dev]].map {
+        dev =>
+          context.actorOf(DeviceStatusWebSocketActor.props(self, buildingId, roomId, dev.id))
       }
       context.become(main)
   }

@@ -27,12 +27,12 @@ class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String,
   }
 
   def init: Receive = LoggingReceive {
-    case devActor: ActorRef =>
+    case dev: Dev =>
 
       val sub = context.system.eventStream.subscribe(self, classOf[DeviceStatus])
       //      log.info("Subscribing to dev " + devActor.path.name + " with succ? " + sub)
 
-      context.become(main(devActor))
+      context.become(main(dev.actorRef))
   }
 
   def main(deviceRef: ActorRef): Receive = LoggingReceive {
@@ -41,11 +41,11 @@ class DeviceStatusWebSocketActor(out: ActorRef, buildingId: String,
     case status: DeviceStatus if (status.pathName.get == deviceRef.path.name) =>
       //    case status: DeviceStatus => // only for debugging purpose..
       out ! Json.obj(
-        "buildingId"-> buildingId, 
-        "roomId"-> roomId, 
-        "deviceId"-> deviceId,
+        "buildingId" -> buildingId,
+        "roomId" -> roomId,
+        "deviceId" -> deviceId,
         "um" -> status.um,
-        "status"-> status)
+        "status" -> status)
   }
 
   // initially, we have to wait the ActorRef of our related DeviceActor.

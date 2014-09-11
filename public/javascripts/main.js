@@ -31,11 +31,11 @@ $(function() {
 
 				var devices = [];
 				$.each(room.devices, function(deviceIdx, device) {
-					console.log("Device: " + deviceIdx + " actor: " + device);
+					console.log("		Device: " + deviceIdx + " actor: " + device);
 
 					var d = {};
-					d["deviceId"] = deviceIdx;
-					d["device"] = device
+					d["deviceId"] = device.id;
+					d["device"] = device.devType;
 
 					// TODO put here initial status
 					d["status"] = "";
@@ -73,6 +73,9 @@ $(function() {
 	var ws = new WebSocket(r.webSocketURL());
 
 	var receiveEvent = function(event) {
+		
+		console.log("Received event: " + event.data);
+		
 		$("#data").append("Last data: " + event.data + "<br />");
 		var obj = $.parseJSON(event.data);
 		$("#"+obj.deviceId).html(obj.um + ": " + obj.status.value);

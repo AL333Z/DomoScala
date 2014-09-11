@@ -100,11 +100,9 @@ object Application extends Controller {
     val timeoutFuture = getTimeoutFuture
     val devicesFuture = getDevicesFuture(buildingId, roomId)
     Future.firstCompletedOf(Seq(devicesFuture, timeoutFuture)).map {
-      case res: Map[_, _] => Ok(Json.obj(
+      case res: Set[_] => Ok(Json.obj(
         "status" -> "OK",
-        "devices" -> res.asInstanceOf[Map[String, ActorRef]].map {
-          case (id, actor) => (id, actor.path.toString)
-        }))
+        "devices" -> res.asInstanceOf[Set[Dev]]))
       case Failed(err) => BadRequest(err.getMessage)
       case t: Throwable => InternalServerError(t.getMessage)
     }
@@ -159,8 +157,8 @@ object Application extends Controller {
   def getRoomsFuture(buildingId: String): Future[Set[Room]] =
     (domo ? GetRooms(buildingId)).mapTo[Set[Room]]
 
-  def getDevicesFuture(buildingId: String, roomId: String): Future[Map[String, ActorRef]] =
-    (domo ? GetDevices(buildingId, roomId)).mapTo[Map[String, ActorRef]]
+  def getDevicesFuture(buildingId: String, roomId: String): Future[Set[Dev]] =
+    (domo ? GetDevices(buildingId, roomId)).mapTo[Set[Dev]]
 
   def getDeviceFuture(buildingId: String, roomId: String, deviceId: String): Future[ActorRef] =
     (domo ? GetDevice(buildingId, roomId, deviceId)).mapTo[ActorRef]
