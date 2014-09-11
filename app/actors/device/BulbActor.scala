@@ -31,11 +31,11 @@ class BulbActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Dev
       } else {
         val newIntensityValue = (actValue.value * 255).toInt
         setPwmValue(newIntensityValue)
-        log.debug("set new value " + newIntensityValue)
+        println("set new value " + newIntensityValue)
 
         // publish new value
         Akka.system.eventStream.publish(ActivationValue(newIntensityValue, Some(self.path.name)))
-        log.debug("received new activation value and now publishing: " + newIntensityValue)
+        println("received new activation value and now publishing: " + newIntensityValue)
 
         context.become(main(newIntensityValue))
         sender ! Ok
