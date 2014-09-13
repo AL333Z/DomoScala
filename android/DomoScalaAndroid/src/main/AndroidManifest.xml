@@ -13,7 +13,8 @@
 
         <activity
             android:name="com.domoscala.android.ConnectActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +24,8 @@
 
         <activity
             android:name="com.domoscala.android.DevicesActivity"
-            android:label="@string/title_activity_devices" >
+            android:label="@string/title_activity_devices"
+            android:screenOrientation="portrait">
         </activity>
 
     </application>

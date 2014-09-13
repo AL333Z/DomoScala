@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import com.domoscala.android.messages.*;
 import com.google.gson.Gson;
@@ -216,5 +218,22 @@ public class DevicesActivity extends ExpandableListActivity {
                 }
             });
         }
+    }
+
+
+    public void setLampStatus(final String room, final String device, final double value){
+        SetDeviceStatusRequest req = new SetDeviceStatusRequest();
+        req.um = "doubleValue";
+        req.value = value;
+        webService.setDeviceStatus(buildingName, room, device, req, new Callback<SetDeviceStatusResponse>() {
+            @Override
+            public void success(SetDeviceStatusResponse setDeviceStatusResponse, Response response) {
+            }
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                retrofitError.printStackTrace();
+                Toast.makeText(DevicesActivity.this, "Setting lamp value failed!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

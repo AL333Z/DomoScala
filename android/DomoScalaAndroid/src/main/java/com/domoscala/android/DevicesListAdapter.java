@@ -1,13 +1,9 @@
 package com.domoscala.android;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckedTextView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import java.util.List;
 
@@ -16,13 +12,13 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
 
     private final List<DevicesListGroup> devicesListGroups;
     private final LayoutInflater inflater;
-    private final Context context;
+    private final DevicesActivity activity;
 
 
-    public DevicesListAdapter(List<DevicesListGroup> devicesListGroups, Context context){
+    public DevicesListAdapter(List<DevicesListGroup> devicesListGroups, DevicesActivity activity){
         this.devicesListGroups = devicesListGroups;
-        this.context = context;
-        inflater = LayoutInflater.from(context);
+        this.activity = activity;
+        inflater = LayoutInflater.from(this.activity);
     }
 
     @Override
@@ -63,7 +59,7 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         if(convertView == null){
-            convertView = inflater.inflate(R.layout.listrowgroup_devices, null);
+            convertView = inflater.inflate(R.layout.listrowgroup_devices, parent, false);
         }
         CheckedTextView textView = (CheckedTextView) convertView;
         textView.setText(devicesListGroups.get(groupPosition).room);
@@ -72,23 +68,34 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView == null){
-            convertView = inflater.inflate(R.layout.listrowchild_devices, null);
+            convertView = inflater.inflate(R.layout.listrowchild_devices, parent, false);
         }
         TextView deviceNameTextView = (TextView) convertView.findViewById(R.id.deviceNameTextView);
         TextView deviceValueTextView = (TextView) convertView.findViewById(R.id.deviceValueTextView);
-        DevicesListGroup.DevicesListItem item = devicesListGroups.get(groupPosition).deviceItems.get(childPosition);
+        final DevicesListGroup.DevicesListItem item = devicesListGroups.get(groupPosition).deviceItems.get(childPosition);
         deviceNameTextView.setText(item.deviceName);
         deviceValueTextView.setText(item.currentValue);
         // TODO set icon or something based on deviceType
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO do something (open a dialog?) depending on the deviceType
-                Toast.makeText(context, "Buuuu!!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        if(item.deviceType.equals("bulb") && !item.deviceName.contains("Button")){
+            SeekBar seekBar = (SeekBar) convertView.findViewById(R.id.lampSeekBar);
+            seekBar.setVisibility(View.VISIBLE);
+            final int seekBarMax = 100;
+            seekBar.setMax(seekBarMax);
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    activity.setLampStatus(devicesListGroups.get(groupPosition).room, item.deviceName, seekBar.getProgress()/((float)seekBarMax));
+                }
+            });
+        }
         return convertView;
     }
 

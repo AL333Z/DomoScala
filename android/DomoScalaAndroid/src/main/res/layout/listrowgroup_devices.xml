@@ -5,9 +5,7 @@
                  android:layout_width="wrap_content"
                  android:layout_height="?android:attr/listPreferredItemHeight"
                  android:layout_marginLeft="8dp"
-                 android:gravity="left"
+                 android:gravity="left|center_vertical"
                  android:paddingLeft="32dp"
-                 android:paddingTop="8dp"
                  android:text="Test"
-                 android:textAlignment="textEnd"
                  android:textStyle="bold" />

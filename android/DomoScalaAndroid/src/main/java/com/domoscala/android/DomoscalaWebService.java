@@ -1,6 +1,7 @@
 package com.domoscala.android;
 
 import com.domoscala.android.messages.BuildingsResponse;
+import com.domoscala.android.messages.SetDeviceStatusRequest;
 import com.domoscala.android.messages.SetDeviceStatusResponse;
 import retrofit.Callback;
 import retrofit.http.*;
@@ -19,6 +20,7 @@ public interface DomoscalaWebService {
             @Path("building") String buildingName,
             @Path("room") String roomName,
             @Path("device") String deviceName,
+            @Body SetDeviceStatusRequest request,
             Callback<SetDeviceStatusResponse> callback
     );
 
