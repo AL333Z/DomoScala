@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/urlEditText"
             android:layout_centerVertical="true"
+            android:text="http://"
             android:layout_toRightOf="@+id/textView"/>
     </RelativeLayout>
 

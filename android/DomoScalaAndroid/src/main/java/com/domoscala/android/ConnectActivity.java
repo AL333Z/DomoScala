@@ -12,6 +12,8 @@ import android.widget.EditText;
 
 public class ConnectActivity extends Activity {
 
+    public static final String URL = "url";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +25,7 @@ public class ConnectActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ConnectActivity.this, DevicesActivity.class);
-                i.putExtra("url", urlEdit.getText().toString());
+                i.putExtra(URL, urlEdit.getText().toString());
                 startActivity(i);
             }
         });
