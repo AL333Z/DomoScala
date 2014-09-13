@@ -10,11 +10,11 @@ Home automation with Scala and Arduino.
 Installation and first run
 ==========================
 
-- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html) (only needed if you want to control real hardware)
+- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html). This is only needed if you want to control real hardware. If you just want to try a sample with simulated sensors/actuators, skip this step.
 - `cd <yourLocalPath>/DomoScala`
-- launch Typesafe Activator script with `./activator`
+- launch Typesafe Activator script with `./activator`. This will download all that is need to launch the application.
 - `run` or `test` or whatever you want.
-- go to [http://localhost:9000/](http://localhost:9000/)
+- go to [http://localhost:9000/](http://localhost:9000/). This will compile and launch the application itself.
 
 Motivations
 ===========
@@ -63,35 +63,41 @@ For more details on APIs, check `conf/routes` file.
 A sample response of a `GET   /buildings` request may have the following format:
 
 ```json
-{  
+{
    "status":"OK",
-   "buildings":[  
-      {  
+   "buildings":[
+      {
          "id":"Building0",
-         "rooms":[  
-            {  
+         "rooms":[
+            {
                "id":"Room0",
-               "devices":{  
-                  "Bulb0":"akka://application/user/domoscala/$a",
-                  "Button0":"akka://application/user/domoscala/$e",
-                  "SoundSensor0":"akka://application/user/domoscala/$h"
-               }
+               "devices":[
+                  {
+                     "id":"Bulb0",
+                     "devType":"bulb"
+                  },
+                  {
+                     "id":"Button0",
+                     "devType":"button"
+                  }
+               ]
             },
-            {  
+            {
                "id":"Room1",
-               "devices":{  
-                  "Bulb1":"akka://application/user/domoscala/$b",
-                  "LightSensor0":"akka://application/user/domoscala/$f",
-                  "Servo0":"akka://application/user/domoscala/$g"
-               }
-            },
-            {  
-               "id":"Room2",
-               "devices":{  
-                  "Bulb2":"akka://application/user/domoscala/$c",
-                  "Temp0":"akka://application/user/domoscala/$d",
-                  "SpeakerSensor0":"akka://application/user/domoscala/$i"
-               }
+               "devices":[
+                  {
+                     "id":"Bulb1",
+                     "devType":"bulb"
+                  },
+                  {
+                     "id":"Thermometer0",
+                     "devType":"temp"
+                  },
+                  {
+                     "id":"LightSensor0",
+                     "devType":"light"
+                  }
+               ]
             }
          ]
       }
