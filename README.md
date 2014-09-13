@@ -19,22 +19,22 @@ Installation and first run
 Motivations
 ===========
 
-This project aims to implement a low-cost home automation system using modern technologies such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), and other exciting stuff. 
+This project aims to implement a low-cost home automation system using modern technologies such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), low power wireless mesh networks, and other exciting stuff. 
 
 *At the time of writing, we only implemented the core of the system, as a proof of concept.*
 
 System architecure
 ==================
-The system itself is a Play framework app. Since Play is built on top of Akka, most of the system components are modeled as akka [actors](http://en.wikipedia.org/wiki/Actor_model).
+The core of the system is a [Play framework](https://www.playframework.com) app. Since Play is built on top of [Akka](http://akka.io), most of the system components are modeled as Akka [actors](http://en.wikipedia.org/wiki/Actor_model).
 
 The app [will] allow the user to configure the structure of its buildings. Each **building** is represented as a set of **rooms**, and each room is modeled as a set of **devices**. All of this components are abstracted by **actors**, interacting via **message-passing**.
 
 **NB**: *At the time of writing, the system configuration is hard-coded inside the app.*
 
 The system consists of:
-* a **server** (even a [Raspberry Pi](http://www.raspberrypi.org/) should work fine)
-* one or more **Arduino** (or other kind of circuits), that interact with the server
-* one or more **clients** app (frontend app, android app, ...)
+* a **server** running the Play application (it should work in any device capable of running Java, even a [Raspberry Pi](http://www.raspberrypi.org/))
+* one or more **Arduino** or other custom boards with sensors and actuators, interacting with the server through a mesh network
+* one or more **clients** that the users interact with (Web application, Android app, ...)
 
 Hardware devices
 ----------
