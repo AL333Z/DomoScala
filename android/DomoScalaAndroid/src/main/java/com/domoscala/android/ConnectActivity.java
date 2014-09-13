@@ -12,20 +12,23 @@ import android.widget.EditText;
 
 public class ConnectActivity extends Activity {
 
-    public static final String URL = "url";
+    public static final String HOSTNAME = "hostname";
+    public static final String PORT = "port";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
 
-        final EditText urlEdit = (EditText) findViewById(R.id.urlEditText);
+        final EditText hostnameEdit = (EditText) findViewById(R.id.hostnameEditText);
+        final EditText portEdit = (EditText) findViewById(R.id.portEditText);
         Button connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ConnectActivity.this, DevicesActivity.class);
-                i.putExtra(URL, urlEdit.getText().toString());
+                i.putExtra(HOSTNAME, hostnameEdit.getText().toString());
+                i.putExtra(PORT, portEdit.getText().toString());
                 startActivity(i);
             }
         });

@@ -30,9 +30,14 @@ public class DevicesActivity extends ExpandableListActivity {
         super.onCreate(savedInstanceState);
 
         try {
+            String httpUrl = "http://" +
+                    getIntent().getStringExtra(ConnectActivity.HOSTNAME) +
+                    ":" +
+                    getIntent().getStringExtra(ConnectActivity.PORT);
+
             // Initialize Retrofit
             RestAdapter restAd = new RestAdapter.Builder()
-                    .setEndpoint(getIntent().getStringExtra(ConnectActivity.URL))
+                    .setEndpoint(httpUrl)
                     .build();
             webService = restAd.create(DomoscalaWebService.class);
 
