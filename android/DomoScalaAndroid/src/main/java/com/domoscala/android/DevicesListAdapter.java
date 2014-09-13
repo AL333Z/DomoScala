@@ -78,8 +78,9 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
         deviceNameTextView.setText(item.deviceName);
         deviceValueTextView.setText(item.currentValue);
         // TODO set icon or something based on deviceType
+        SeekBar seekBar = (SeekBar) convertView.findViewById(R.id.lampSeekBar);
         if(item.deviceType.equals("bulb") && !item.deviceName.contains("Button")){
-            SeekBar seekBar = (SeekBar) convertView.findViewById(R.id.lampSeekBar);
+
             seekBar.setVisibility(View.VISIBLE);
             final int seekBarMax = 100;
             seekBar.setMax(seekBarMax);
@@ -95,6 +96,8 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
                     activity.setLampStatus(devicesListGroups.get(groupPosition).room, item.deviceName, seekBar.getProgress()/((float)seekBarMax));
                 }
             });
+        } else {
+            seekBar.setVisibility(View.GONE);
         }
         return convertView;
     }
