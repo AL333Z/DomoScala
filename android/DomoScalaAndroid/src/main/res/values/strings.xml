@@ -3,7 +3,7 @@
 
     <string name="app_name">DomoScala</string>
     <string name="action_settings">Settings</string>
-    <string name="welcome"><b>Welcome to DomoScala!</b>\nThis is a remote control app of the DomoScala server.</string>
+    <string name="welcome"><b>Welcome to DomoScala!</b>\nThis is a remote control app of the DomoScala home automation system.\nPlease enter the hostname (or IP address) and port of the DomoScala Play server.</string>
     <string name="title_activity_devices">DevicesActivity</string>
     <string name="hello_world">Hello world!</string>
 

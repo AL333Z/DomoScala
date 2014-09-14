@@ -10,36 +10,41 @@ Home automation with Scala and Arduino.
 Installation and first run
 ==========================
 
-- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html) (only needed if you want to control real hardware)
+- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html). This is only needed if you want to control real hardware. If you just want to try a sample with simulated sensors/actuators, skip this step.
 - `cd <yourLocalPath>/DomoScala`
-- launch Typesafe Activator script with `./activator`
+- launch Typesafe Activator script with `./activator`. This will download all that is need to launch the application.
 - `run` or `test` or whatever you want.
-- go to [http://localhost:9000/](http://localhost:9000/)
+- go to [http://localhost:9000/](http://localhost:9000/). This will compile and launch the application itself.
 
 Motivations
 ===========
 
-This project aims to implement a low-cost home automation system using modern technologies such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), and other exciting stuff. 
+This project aims to implement a low-cost home automation system using modern technologies such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), low power wireless mesh networks, and other exciting stuff. 
 
 *At the time of writing, we only implemented the core of the system, as a proof of concept.*
 
 System architecure
 ==================
-The system itself is a Play framework app. Since Play is built on top of Akka, most of the system components are modeled as akka [actors](http://en.wikipedia.org/wiki/Actor_model).
+The core of the system is a [Play framework](https://www.playframework.com) app. Since Play is built on top of [Akka](http://akka.io), most of the system components are modeled as Akka [actors](http://en.wikipedia.org/wiki/Actor_model).
 
 The app [will] allow the user to configure the structure of its buildings. Each **building** is represented as a set of **rooms**, and each room is modeled as a set of **devices**. All of this components are abstracted by **actors**, interacting via **message-passing**.
 
 **NB**: *At the time of writing, the system configuration is hard-coded inside the app.*
 
 The system consists of:
-* a **server** (even a [Raspberry Pi](http://www.raspberrypi.org/) should work fine)
-* one or more **Arduino** (or other kind of circuits), that interact with the server
-* one or more **clients** app (frontend app, android app, ...)
+* a **server** running the Play application (it should work in any device capable of running Java, even a [Raspberry Pi](http://www.raspberrypi.org/))
+* one or more **Arduino** or other custom boards with sensors (temperature, buttons, ...) and actuators (lamps, locks, ...)
+* one or more **clients** that let the users interact with the system (Web application, Android app, ...)
 
 Hardware devices
 ----------
-Arduino and some custom boards are used to make a small home automation system, composed of many devices each with many **sensors** and **actuators** attached.
-**[Meshnet](https://github.com/mattibal/meshnet)** library is used to build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices that you can put around your home. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. 
+The home automation system is able to control real electrical sensors and actuators through the use of microcontrollers, small computers that are able to directly control many electrical components. The microcontroller platform that we choose is the very popular [Arduino](http://arduino.cc). It's possible to use the official Arduino Uno board, or also make a completely custom board based on the AVR Atmega328, the same chip of the official one.
+
+A good home automation system is composed by a lot of small devices, that are spread in the various parts of the house. So it's very important for the devices to have a low cost and to have a wireless connection with an high range (greater than Wifi) and low power consumption, in order to be potentially battery powered.
+
+For achieve this goal we developed **[Meshnet](https://github.com/mattibal/meshnet)**, a Java and Arduino library that build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. At the physical level, Meshnet uses [nRF24l1](http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo) proprietary low-power 2,4 GHz wireless modules, that can be bought at 1€ each, and various kind of serial communications where you need wired connections.
+
+With these technologies we can achieve a better wireless coverage than Wifi, a greater flexibility since the devices could be battery operated, and a much lower cost than using many Raspberry Pi with Wifi or Ethernet connections in many places of the house.
 
 API
 -----
@@ -49,7 +54,7 @@ The app provide some **REST APIs** to interact with the system. For example, a c
 GET   /buildings    
 ```
 
-The app also provide APIs to get notified when something happens inside the system (aka **pubblish/subscribe**). This feature allows other developers to develop client app that receive updates in *real-time*.
+The app also provide APIs to get notified when something happens inside the system (aka **publish/subscribe**). This feature allows other developers to develop client app that receive updates in *real-time*.
 To achieve this goal, we use **[Web Sockets](http://en.wikipedia.org/wiki/WebSocket)** combined with **actors**.
 For example, a client can be notified of all system event (coming from all buildings in the system).
 
@@ -63,35 +68,41 @@ For more details on APIs, check `conf/routes` file.
 A sample response of a `GET   /buildings` request may have the following format:
 
 ```json
-{  
+{
    "status":"OK",
-   "buildings":[  
-      {  
+   "buildings":[
+      {
          "id":"Building0",
-         "rooms":[  
-            {  
+         "rooms":[
+            {
                "id":"Room0",
-               "devices":{  
-                  "Bulb0":"akka://application/user/domoscala/$a",
-                  "Button0":"akka://application/user/domoscala/$e",
-                  "SoundSensor0":"akka://application/user/domoscala/$h"
-               }
+               "devices":[
+                  {
+                     "id":"Bulb0",
+                     "devType":"bulb"
+                  },
+                  {
+                     "id":"Button0",
+                     "devType":"button"
+                  }
+               ]
             },
-            {  
+            {
                "id":"Room1",
-               "devices":{  
-                  "Bulb1":"akka://application/user/domoscala/$b",
-                  "LightSensor0":"akka://application/user/domoscala/$f",
-                  "Servo0":"akka://application/user/domoscala/$g"
-               }
-            },
-            {  
-               "id":"Room2",
-               "devices":{  
-                  "Bulb2":"akka://application/user/domoscala/$c",
-                  "Temp0":"akka://application/user/domoscala/$d",
-                  "SpeakerSensor0":"akka://application/user/domoscala/$i"
-               }
+               "devices":[
+                  {
+                     "id":"Bulb1",
+                     "devType":"bulb"
+                  },
+                  {
+                     "id":"Thermometer0",
+                     "devType":"temp"
+                  },
+                  {
+                     "id":"LightSensor0",
+                     "devType":"light"
+                  }
+               ]
             }
          ]
       }
@@ -120,15 +131,33 @@ This approach avoids the need to continuously reload the page to get the latest 
 
 Android
 ----------
-The android app [will] be nothing special. Just an app that use REST APIs and Web Sockets to update some list views.
-It's pretty the same as the html+js fronted, but developed with **Android SDK**.
+The Android application for the moment is just a simple remote control app that use REST APIs and Web Sockets to update some list views.
+It's pretty the same as the html+js fronted, but with a native Android UI.
 
 Implementation
 ==============
 
 Arduino and Meshnet
 -------------------
-//TODO 
+In order to make the DomoScala system works with real sensors and actuators, you need at least one Arduino Uno (or custom compatible) board running a sketch (firmware) that uses the MeshNet library, and connected with the computer running the DomoScala Play application through a serial connection (usually the USB port of the Arduino).
+
+If the Arduino has two communication interfaces connected (for example the USB Serial and the nRF24l01 wireless module), it can act as a router and relay packets between devices connected to the interface 1 (for example the computer running DomoScala) and the ones connected to interface 2 (for example another Arduino with a nRF24l01 wireless module), thanks to the mesh networking functionality of MeshNet library.
+
+An usual MeshNet device could be an Arduino running a sketch based on [this example template](https://github.com/mattibal/meshnet/blob/master/arduino%20sketches/MeshNet_Serial_RF24/MeshNet_Serial_RF24.ino). In the comments in the source code are also specified the electrical connections to do between the Arduino and nRF24l01 module. 
+
+In the sketch you basically have to implement an handler code for each type of messages arriving from the MeshNet base (the computer running DomoScala). In the example sketch above there is some code that perform some I/O on the Arduino pins, to which you can connect some sensors and actuators.
+
+
+Hardware devices prototypes
+-------------------
+We have designed and build some prototype home automation devices with some simple sensors and actuators, that can communicate and work perfectly with the DomoScala system.
+
+This is a fully wireless and battery operated one made with a custom PCB:
+
+![Custom board](docs/images/board1.jpg)
+
+The thermistor and the CdS photoresistor are connected to analog input (ADC) pins, and the LED to a PWM output. The sensors and actuators of this board are hardcoded in current implementation of DomoScala to be put in the "Room1". room.
+
 
 Actors
 ------
