@@ -33,13 +33,17 @@ The app [will] allow the user to configure the structure of its buildings. Each 
 
 The system consists of:
 * a **server** running the Play application (it should work in any device capable of running Java, even a [Raspberry Pi](http://www.raspberrypi.org/))
-* one or more **Arduino** or other custom boards with sensors and actuators, interacting with the server through a mesh network
-* one or more **clients** that the users interact with (Web application, Android app, ...)
+* one or more **Arduino** or other custom boards with sensors (temperature, buttons, ...) and actuators (lamps, locks, ...)
+* one or more **clients** that let the users interact with the system (Web application, Android app, ...)
 
 Hardware devices
 ----------
-Arduino and some custom boards are used to make a small home automation system, composed of many devices each with many **sensors** and **actuators** attached.
-**[Meshnet](https://github.com/mattibal/meshnet)** library is used to build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices that you can put around your home. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. 
+The home automation system is able to control real electrical sensors and actuators through the use of microcontrollers, small computers that are able to directly control many electrical components. The microcontroller platform that we choose is the very popular [Arduino](http://arduino.cc). It's possible to use the official Arduino Uno board, or also make a completely custom board based on the AVR Atmega328, the same chip of the official one.
+
+A good home automation system is composed by a lot of small devices, that are spread in the various parts of the house. So it's very important for the devices to have a low cost and to have a wireless connection with an high range (greater than Wifi) and low power consumption, in order to be potentially battery powered.
+For achieve this goal we developed **[Meshnet](https://github.com/mattibal/meshnet)**, a Java and Arduino library that build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. At the physical level, Meshnet uses [nRF24l1](http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo) proprietary low-power 2,4 GHz wireless modules, that can be bought at 1€ each, and various kind of serial communications where you need wired connections.
+
+With these technologies we can achieve a better wireless coverage than Wifi, a greater flexibility since the devices could be battery operated, and a much lower cost than using many Raspberry Pi with Wifi or Ethernet connections in many places of the house.
 
 API
 -----
@@ -49,7 +53,7 @@ The app provide some **REST APIs** to interact with the system. For example, a c
 GET   /buildings    
 ```
 
-The app also provide APIs to get notified when something happens inside the system (aka **pubblish/subscribe**). This feature allows other developers to develop client app that receive updates in *real-time*.
+The app also provide APIs to get notified when something happens inside the system (aka **publish/subscribe**). This feature allows other developers to develop client app that receive updates in *real-time*.
 To achieve this goal, we use **[Web Sockets](http://en.wikipedia.org/wiki/WebSocket)** combined with **actors**.
 For example, a client can be notified of all system event (coming from all buildings in the system).
 
