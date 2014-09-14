@@ -24,7 +24,7 @@ class ButtonActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends D
 
   def parseFromDeviceMessage(msg: FromDeviceMessage) {
     if (msg.command == 5) {
-      println("button pressed!")
+      log.debug("button pressed!")
       Akka.system.eventStream.publish(ActivationValue(1, Some(self.path.name)))
     }
   }
