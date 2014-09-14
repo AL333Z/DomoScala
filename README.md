@@ -155,6 +155,8 @@ This is a fully wireless and battery operated one made with a custom PCB:
 
 ![Custom board](docs/images/board1.jpg)
 
+The thermistor and the CdS photoresistor are connected to analog input (ADC) pins, and the LED to a PWM output. The sensors and actuators of this board are hardcoded in current implementation of DomoScala to be put in the "Room1". room.
+
 
 Actors
 ------
