@@ -7,7 +7,7 @@ $(function() {
 			<h2>{{roomId}}</h2>	\
 		    <ul class='list-group {{roomId}}'>	\
 		    	{{#devices}}	\
-				<li class='list-group-item {{deviceId}}'>	\
+				<li class='list-group-item' id='{{deviceId}}-li'>	\
 			    	<span class='badge' id='{{deviceId}}'>{{status}}</span>	\
 			    	{{deviceId}}	\
 			   </li>\
@@ -30,18 +30,20 @@ $(function() {
 				console.log("	Room: " + room.id);
 
 				var devices = [];
-				$.each(room.devices, function(deviceIdx, device) {
-					console.log("		Device: " + deviceIdx + " actor: " + device);
+				$.each(room.devices,
+						function(deviceIdx, device) {
+							console.log("		Device: " + deviceIdx + " actor: "
+									+ device);
 
-					var d = {};
-					d["deviceId"] = device.id;
-					d["device"] = device.devType;
+							var d = {};
+							d["deviceId"] = device.id;
+							d["device"] = device.devType;
 
-					// TODO put here initial status
-					d["status"] = "";
+							// TODO put here initial status
+							d["status"] = "";
 
-					devices.push(d);
-				});
+							devices.push(d);
+						});
 
 				var r = {};
 				r["roomId"] = room.id;
@@ -73,13 +75,29 @@ $(function() {
 	var ws = new WebSocket(r.webSocketURL());
 
 	var receiveEvent = function(event) {
-		
+
 		console.log("Received event: " + event.data);
-		
-		$("#data").append("Last data: " + event.data + "<br />");
+
+		// $("#data").append("Last data: " + event.data + "<br />");
+
 		var obj = $.parseJSON(event.data);
-		$("#"+obj.deviceId).html(obj.um + ": " + obj.status.value);
-		
+		$("#" + obj.deviceId).html(obj.um + ": " + obj.status.value);
+
+		var alertHtml = "<div class='alert alert-success alert-dismissible' id='"
+				+ event.data["deviceId"]
+				+ "-alert' role='alert'> \
+							<button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button> \
+							<p><b>"
+				+ obj.deviceId
+				+ "</b> changed its status: <b>"
+				+ obj.um
+				+ ": "
+				+ obj.status.value + "</b></p> \
+						</div>"
+
+		$(".alert").slice(10).remove(); // clean old values..
+		$("#alerts").prepend(alertHtml);
+
 	}
 	ws.onmessage = receiveEvent;
 });
