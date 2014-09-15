@@ -3,23 +3,22 @@ DomoScala
 
 Home automation with Scala and Arduino.
 
-**Currently, there's nothing exciting to try out.**
-
 [![Build Status](https://travis-ci.org/AL333Z/DomoScala.svg?branch=master)](https://travis-ci.org/AL333Z/DomoScala)
 
 Installation and first run
 ==========================
 
-- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html). This is only needed if you want to control real hardware. If you just want to try a sample with simulated sensors/actuators, skip this step.
+- install [RXTX native driver for your OS](http://jlog.org/rxtx-mac.html). *This is only needed if you want to control real hardware. If you just want to try a sample with simulated sensors/actuators, skip this step.*
+- clone DomoScala repo
 - `cd <yourLocalPath>/DomoScala`
 - launch Typesafe Activator script with `./activator`. This will download all that is need to launch the application.
-- `run` or `test` or whatever you want.
-- go to [http://localhost:9000/](http://localhost:9000/). This will compile and launch the application itself.
+   - launch the application (listening on port 9000) with `run`
+   - go to [http://localhost:9000/](http://localhost:9000/). This will compile and launch the application itself.
 
 Motivations
 ===========
 
-This project aims to implement a low-cost home automation system using modern technologies such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), low power wireless mesh networks, and other exciting stuff. 
+This project aims to implement a low-cost **home automation system using modern technologies** such as [Scala lang](http://www.scala-lang.org), [Play framework](http://www.playframework.com), [Akka](http://akka.io/), [Arduino](http://arduino.cc/), low power wireless mesh networks, and other exciting stuff. 
 
 *At the time of writing, we only implemented the core of the system, as a proof of concept.*
 
@@ -27,7 +26,7 @@ System architecure
 ==================
 The core of the system is a [Play framework](https://www.playframework.com) app. Since Play is built on top of [Akka](http://akka.io), most of the system components are modeled as Akka [actors](http://en.wikipedia.org/wiki/Actor_model).
 
-The app [will] allow the user to configure the structure of its buildings. Each **building** is represented as a set of **rooms**, and each room is modeled as a set of **devices**. All of this components are abstracted by **actors**, interacting via **message-passing**.
+The app [will] allow the user to configure the structure of its buildings. Each **building** is represented as a set of **rooms**, and each room is modeled as a set of **devices**. All devices are abstracted by **actors**, interacting via **message-passing**.
 
 **NB**: *At the time of writing, the system configuration is hard-coded inside the app.*
 
@@ -38,13 +37,13 @@ The system consists of:
 
 Hardware devices
 ----------
-The home automation system is able to control real electrical sensors and actuators through the use of microcontrollers, small computers that are able to directly control many electrical components. The microcontroller platform that we choose is the very popular [Arduino](http://arduino.cc). It's possible to use the official Arduino Uno board, or also make a completely custom board based on the AVR Atmega328, the same chip of the official one.
+The home automation system is able to control **real electrical sensors and actuators** through the use of **microcontrollers**, small computers that are able to directly control many electrical components. The microcontroller platform that we choose is the very popular [Arduino](http://arduino.cc). It's possible to use the official **Arduino Uno board**, or also make a completely **custom board based on the AVR Atmega328**, the same chip of the official one.
 
-A good home automation system is composed by a lot of small devices, that are spread in the various parts of the house. So it's very important for the devices to have a low cost and to have a wireless connection with an high range (greater than Wifi) and low power consumption, in order to be potentially battery powered.
+A good home automation system is composed by a lot of **small devices**, that are spread in the various parts of the house. So it's very important for the devices to have a low cost and to have a **wireless connection with an high range** (greater than Wifi) and **low power consumption**, in order to be potentially battery powered.
 
-For achieve this goal we developed **[Meshnet](https://github.com/mattibal/meshnet)**, a Java and Arduino library that build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. At the physical level, Meshnet uses [nRF24l1](http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo) proprietary low-power 2,4 GHz wireless modules, that can be bought at 1€ each, and various kind of serial communications where you need wired connections.
+For achieve this goal we developed **[Meshnet](https://github.com/mattibal/meshnet)**, a Java and Arduino library that build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (~5€) devices. In this kind of network, **every device is also a router that can relay packets for other devices**, extending the wireless range of the whole network. At the physical level, Meshnet uses [nRF24l1](http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo), a proprietary low-power 2,4 GHz wireless modules that can be bought at ~1€ each, and various kind of serial communications where you need wired connections.
 
-With these technologies we can achieve a better wireless coverage than Wifi, a greater flexibility since the devices could be battery operated, and a much lower cost than using many Raspberry Pi with Wifi or Ethernet connections in many places of the house.
+With these technologies we can achieve a better **wireless coverage** than Wifi, a greater **flexibility** since the devices could be battery operated, and a much lower **cost** than using many Raspberry Pi with Wifi or Ethernet connections in many places of the house.
 
 API
 -----
@@ -62,7 +61,7 @@ For example, a client can be notified of all system event (coming from all build
 GET   /push    
 ```
 
-The APIs support both **fine grained and coarse grained granularity** when querying system status. Thus, a client can request/subscribe to information for all buildings and/or for a single device.
+The APIs support both **fine grained and coarse grained granularity** when querying system status. Thus, a client can request/subscribe for/to information from all buildings to a single device.
 For more details on APIs, check `conf/routes` file.
 
 A sample response of a `GET   /buildings` request may have the following format:
@@ -141,11 +140,11 @@ Arduino and Meshnet
 -------------------
 In order to make the DomoScala system works with real sensors and actuators, you need at least one Arduino Uno (or custom compatible) board running a sketch (firmware) that uses the MeshNet library, and connected with the computer running the DomoScala Play application through a serial connection (usually the USB port of the Arduino).
 
-If the Arduino has two communication interfaces connected (for example the USB Serial and the nRF24l01 wireless module), it can act as a router and relay packets between devices connected to the interface 1 (for example the computer running DomoScala) and the ones connected to interface 2 (for example another Arduino with a nRF24l01 wireless module), thanks to the mesh networking functionality of MeshNet library.
+If the **Arduino** has two communication interfaces connected (for example the USB Serial and the nRF24l01 wireless module), it can **act as a router** and relay packets between devices connected to the interface 1 (for example the computer running DomoScala) and the ones connected to interface 2 (for example another Arduino with a nRF24l01 wireless module), thanks to the mesh networking functionality of MeshNet library.
 
-An usual MeshNet device could be an Arduino running a sketch based on [this example template](https://github.com/mattibal/meshnet/blob/master/arduino%20sketches/MeshNet_Serial_RF24/MeshNet_Serial_RF24.ino). In the comments in the source code are also specified the electrical connections to do between the Arduino and nRF24l01 module. 
+A common **MeshNet device** could be an Arduino running a sketch based on [this example template](https://github.com/mattibal/meshnet/blob/master/arduino%20sketches/MeshNet_Serial_RF24/MeshNet_Serial_RF24.ino). In the comments inside the source code are also specified the electrical connections to do between the Arduino and nRF24l01 module. 
 
-In the sketch you basically have to implement an handler code for each type of messages arriving from the MeshNet base (the computer running DomoScala). In the example sketch above there is some code that perform some I/O on the Arduino pins, to which you can connect some sensors and actuators.
+In the sketch, you basically have to implement an handler code for each type of messages arriving from the MeshNet base (the computer running DomoScala). In the example sketch above there is some code that perform some I/O on the Arduino pins, to which you can connect some sensors and actuators.
 
 This is an overview of how the various parts of the system are interconnected:
 
@@ -153,24 +152,25 @@ This is an overview of how the various parts of the system are interconnected:
 
 The "MeshNet Devices" in the bottom of the diagram are the various Arduino or custom boards on which you can install sensors or actuators, interconnected with a mesh network with the computer running the Play application.
 
-The topology of the mesh network is automatically generated at startup of the Play app in the server, by broadcasting a beacon signal in order to discover the active MeshNet devices and their interconnections.
+The **topology** of the mesh network is automatically generated at startup of the Play app in the server, by broadcasting a beacon signal in order to discover the active MeshNet devices and their interconnections.
 
 
 Hardware devices prototypes
 -------------------
-We have designed and build some prototype home automation devices with some simple sensors and actuators, that can communicate and work perfectly with the DomoScala system.
+We have designed and build some prototype of home automation devices with some simple sensors and actuators, that can communicate and work perfectly with the DomoScala system.
 
 This is a fully wireless and battery operated one made with a custom PCB:
 
 ![Custom board](docs/images/board1.jpg)
 
-The thermistor and the CdS photoresistor are connected to analog input (ADC) pins, and the LED to a PWM output. The sensors and actuators of this board are hardcoded in current implementation of DomoScala to be put in the "Room1". room.
+The **thermistor** and the **CdS photoresistor** are connected to analog input (ADC) pins, and the **LED** to a PWM output. *The sensors and actuators of this board are hardcoded in current implementation of DomoScala to be put in the "Room1". room.*
 
+Actors and API
+--------------
 
-Actors
-------
+![Backend](docs/images/whole-system.png)
 
-The main actor of the system is *DomoscalaActor* (`actors.DomoscalaActor.scala`). It wraps all the system configurations and structure and all other actor (and APIs) has to interact to that.
+The main actor of the system is *DomoscalaActor* (`actors.DomoscalaActor.scala`). It wraps all the system configurations and structure and all actors (and APIs) has to interact to this one.
 
 *MeshnetBase* (`actors.Meshnet.scala`) wraps the interaction with meshnet library. It's a facade that allows the interaction with meshnet (and so, with physical devices) via message-passing.
 
@@ -178,9 +178,6 @@ The main actor of the system is *DomoscalaActor* (`actors.DomoscalaActor.scala`)
 
 The interaction between all system components is defined in `test` folder, containing all tests specs.
 
-API
----
-
 Every APIs is **asynchronous from the bottom up**. The system handles every request in an [asynchronous, non-blocking way](https://www.playframework.com/documentation/2.3.x/ScalaAsync). Thus, if the client request a heavy operation to the server, the client will be blocked while waiting for the response, but nothing will be blocked on the server, and server resources can be used to serve other clients.
 
-[Web Sockets](https://www.playframework.com/documentation/2.3.x/ScalaWebSockets) allows the implementation of Publish/Subscribe feature. Thus, there's a **two way full duplex communication channel** between clients and the server that enable the flow of new contents from the server to the client once the contents are produced, timely.
+[Web Sockets](https://www.playframework.com/documentation/2.3.x/ScalaWebSockets) allows the implementation of Publish/Subscribe feature. Thus, there's a **two way full duplex communication channel** between clients and the server that enables the flow of new contents from the server to the client once the contents are produced, timely.
