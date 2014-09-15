@@ -147,6 +147,14 @@ An usual MeshNet device could be an Arduino running a sketch based on [this exam
 
 In the sketch you basically have to implement an handler code for each type of messages arriving from the MeshNet base (the computer running DomoScala). In the example sketch above there is some code that perform some I/O on the Arduino pins, to which you can connect some sensors and actuators.
 
+This is an overview of how the various parts of the system are interconnected:
+
+![System diagram](docs/images/systemdiagram1.png)
+
+The "MeshNet Devices" in the bottom of the diagram are the various Arduino or custom boards on which you can install sensors or actuators, interconnected with a mesh network with the computer running the Play application.
+
+The topology of the mesh network is automatically generated at startup of the Play app in the server, by broadcasting a beacon signal in order to discover the active MeshNet devices and their interconnections.
+
 
 Hardware devices prototypes
 -------------------
