@@ -31,11 +31,11 @@ class BulbActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Dev
       } else {
         val newIntensityValue = (actValue.value * 255).toInt
         setPwmValue(newIntensityValue)
-        println("set new value " + newIntensityValue)
+        log.debug("set new value " + newIntensityValue)
 
         // publish new value
         Akka.system.eventStream.publish(ActivationValue(newIntensityValue, Some(self.path.name)))
-        println("received new activation value and now publishing: " + newIntensityValue)
+        log.debug("received new activation value and now publishing: " + newIntensityValue)
 
         context.become(main(newIntensityValue))
         sender ! Ok
@@ -49,8 +49,7 @@ class BulbActor(name: String, meshnetActor: ActorRef, deviceId: Int) extends Dev
    * This makes a low-level Meshnet message to be sent to the device
    */
   def setPwmValue(pwmValue: Int) = {
-    //TODO find a better way to convert data to Java sh*t Byte stuff
-    println("Sending command to meshnet..")
+    log.debug("Sending command to meshnet..")
     meshnetActor ! ToDeviceMessage(deviceId, meshnetCommand, Array[Byte]((pwmValue).toByte))
   }
 }

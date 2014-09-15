@@ -39,12 +39,12 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
 
         val domo = Await.result(system.actorSelection("user/domoscala").resolveOne, maxTimeout)
         testProbe.send(domo, GetDevice(chosenBuilding, chosenRoom, chosenDev))
-        val deviceActor = testProbe.expectMsgClass(maxTimeout, classOf[ActorRef])
+        val device = testProbe.expectMsgClass(maxTimeout, classOf[Dev])
 
         // pubblish some values
-        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActor.path.name)))
-        system.eventStream.publish(TemperatureValue(Random.nextFloat, Some(deviceActor.path.name)))
-        system.eventStream.publish(LightValue(Random.nextFloat, Some(deviceActor.path.name)))
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(device.actorRef.path.name)))
+        system.eventStream.publish(TemperatureValue(Random.nextFloat, Some(device.actorRef.path.name)))
+        system.eventStream.publish(LightValue(Random.nextFloat, Some(device.actorRef.path.name)))
 
         testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
         testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
@@ -68,12 +68,12 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
 
         val domo = Await.result(system.actorSelection("user/domoscala").resolveOne, maxTimeout)
         testProbe.send(domo, GetDevice(chosenBuilding, chosenRoom, chosenDev))
-        val deviceActor = testProbe.expectMsgClass(maxTimeout, classOf[ActorRef])
+        val device = testProbe.expectMsgClass(maxTimeout, classOf[Dev])
 
         // pubblish some values
-        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActor.path.name)))
-        system.eventStream.publish(TemperatureValue(Random.nextFloat, Some(deviceActor.path.name)))
-        system.eventStream.publish(LightValue(Random.nextFloat, Some(deviceActor.path.name)))
+        system.eventStream.publish(SoundValue(Random.nextFloat, Some(device.actorRef.path.name)))
+        system.eventStream.publish(TemperatureValue(Random.nextFloat, Some(device.actorRef.path.name)))
+        system.eventStream.publish(LightValue(Random.nextFloat, Some(device.actorRef.path.name)))
 
         testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
         testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
@@ -97,14 +97,22 @@ class WebSocketActorSpecs extends PlaySpec with OneAppPerSuite {
 
         val domo = Await.result(system.actorSelection("user/domoscala").resolveOne, maxTimeout)
         testProbe.send(domo, GetDevices(chosenBuilding, chosenRoom))
-        val deviceActors = testProbe.expectMsgClass(maxTimeout, classOf[Map[String, ActorRef]])
+        val deviceActors = testProbe.expectMsgClass(maxTimeout, classOf[Set[Dev]])
+
+        deviceActors.foreach { d =>
+          val status: DeviceStatus = d.devType match {
+            case bulbType => ActivationValue(1.0, Some(d.actorRef.path.name))
+            case tempType => TemperatureValue(30.0, Some(d.actorRef.path.name))
+            case lightType => LightValue(10.0, Some(d.actorRef.path.name))
+            case buttonType => ActivationValue(1.0, Some(d.actorRef.path.name))
+          }
+          system.eventStream.publish(status)
+        }
 
         // pubblish some values
-        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("LightSensor0").path.name)))
-        system.eventStream.publish(SoundValue(Random.nextFloat, Some(deviceActors("LightSensor0").path.name)))
-
-        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
-        testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+        deviceActors.foreach { d =>
+          testProbe.expectMsgClass(maxTimeout, classOf[JsValue])
+        }
 
       }
     }

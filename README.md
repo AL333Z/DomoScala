@@ -41,6 +41,7 @@ Hardware devices
 The home automation system is able to control real electrical sensors and actuators through the use of microcontrollers, small computers that are able to directly control many electrical components. The microcontroller platform that we choose is the very popular [Arduino](http://arduino.cc). It's possible to use the official Arduino Uno board, or also make a completely custom board based on the AVR Atmega328, the same chip of the official one.
 
 A good home automation system is composed by a lot of small devices, that are spread in the various parts of the house. So it's very important for the devices to have a low cost and to have a wireless connection with an high range (greater than Wifi) and low power consumption, in order to be potentially battery powered.
+
 For achieve this goal we developed **[Meshnet](https://github.com/mattibal/meshnet)**, a Java and Arduino library that build a wireless-wired (mixed) [mesh network](http://en.wikipedia.org/wiki/Mesh_networking) of many low cost (5€) devices. In this kind of network, every device is also a router that can relay packets for other devices, extending the wireless range of the whole network. At the physical level, Meshnet uses [nRF24l1](http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo) proprietary low-power 2,4 GHz wireless modules, that can be bought at 1€ each, and various kind of serial communications where you need wired connections.
 
 With these technologies we can achieve a better wireless coverage than Wifi, a greater flexibility since the devices could be battery operated, and a much lower cost than using many Raspberry Pi with Wifi or Ethernet connections in many places of the house.
@@ -130,15 +131,33 @@ This approach avoids the need to continuously reload the page to get the latest 
 
 Android
 ----------
-The android app [will] be nothing special. Just an app that use REST APIs and Web Sockets to update some list views.
-It's pretty the same as the html+js fronted, but developed with **Android SDK**.
+The Android application for the moment is just a simple remote control app that use REST APIs and Web Sockets to update some list views.
+It's pretty the same as the html+js fronted, but with a native Android UI.
 
 Implementation
 ==============
 
 Arduino and Meshnet
 -------------------
-//TODO 
+In order to make the DomoScala system works with real sensors and actuators, you need at least one Arduino Uno (or custom compatible) board running a sketch (firmware) that uses the MeshNet library, and connected with the computer running the DomoScala Play application through a serial connection (usually the USB port of the Arduino).
+
+If the Arduino has two communication interfaces connected (for example the USB Serial and the nRF24l01 wireless module), it can act as a router and relay packets between devices connected to the interface 1 (for example the computer running DomoScala) and the ones connected to interface 2 (for example another Arduino with a nRF24l01 wireless module), thanks to the mesh networking functionality of MeshNet library.
+
+An usual MeshNet device could be an Arduino running a sketch based on [this example template](https://github.com/mattibal/meshnet/blob/master/arduino%20sketches/MeshNet_Serial_RF24/MeshNet_Serial_RF24.ino). In the comments in the source code are also specified the electrical connections to do between the Arduino and nRF24l01 module. 
+
+In the sketch you basically have to implement an handler code for each type of messages arriving from the MeshNet base (the computer running DomoScala). In the example sketch above there is some code that perform some I/O on the Arduino pins, to which you can connect some sensors and actuators.
+
+
+Hardware devices prototypes
+-------------------
+We have designed and build some prototype home automation devices with some simple sensors and actuators, that can communicate and work perfectly with the DomoScala system.
+
+This is a fully wireless and battery operated one made with a custom PCB:
+
+![Custom board](docs/images/board1.jpg)
+
+The thermistor and the CdS photoresistor are connected to analog input (ADC) pins, and the LED to a PWM output. The sensors and actuators of this board are hardcoded in current implementation of DomoScala to be put in the "Room1". room.
+
 
 Actors
 ------
