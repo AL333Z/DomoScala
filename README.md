@@ -185,4 +185,6 @@ Every APIs is **asynchronous from the bottom up**. The system handles every requ
 Screenshots
 ------------
 
+- Front-end
+
 ![front-end](docs/images/fronend-client-screenshot.png)
