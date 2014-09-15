@@ -77,9 +77,10 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
         final DevicesListGroup.DevicesListItem item = devicesListGroups.get(groupPosition).deviceItems.get(childPosition);
         deviceNameTextView.setText(item.deviceName);
         deviceValueTextView.setText(item.currentValue);
-        // TODO set icon or something based on deviceType
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.deviceIconImageView);
         SeekBar seekBar = (SeekBar) convertView.findViewById(R.id.lampSeekBar);
         if(item.deviceType.equals("bulb") && !item.deviceName.contains("Button")){
+            imageView.setImageResource(R.drawable.ic_lamp);
 
             seekBar.setVisibility(View.VISIBLE);
             final int seekBarMax = 100;
@@ -98,6 +99,15 @@ public class DevicesListAdapter extends BaseExpandableListAdapter {
             });
         } else {
             seekBar.setVisibility(View.GONE);
+        }
+        if(item.deviceName.contains("Button")){
+            imageView.setImageResource(R.drawable.ic_switch);
+        }
+        if(item.deviceType.equals("light")){
+            imageView.setImageResource(R.drawable.ic_light);
+        }
+        if(item.deviceType.equals("temp")){
+            imageView.setImageResource(R.drawable.ic_temp);
         }
         return convertView;
     }
