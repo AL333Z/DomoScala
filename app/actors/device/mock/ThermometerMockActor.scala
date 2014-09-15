@@ -33,6 +33,8 @@ class ThermometerMockActor(name: String) extends ThermometerActor(name, null, -1
   override def parseFromDeviceMessage(msg: FromDeviceMessage): Double = {
     // given a response from the device, return read value (since we are just 
     // mocking, only returning a random value is enough)
-    10.0f + (Random.nextDouble() * 20)
+    val value = (10.0f + (Random.nextDouble() * 20))
+    val roundedValue = (math rint value * 100) / 100
+    roundedValue
   }
 }

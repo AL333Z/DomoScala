@@ -71,7 +71,8 @@ class ThermometerActor(name: String, meshnetActor: ActorRef, deviceId: Int) exte
       val logRes = Math.log(thermistorResistance)
       val tempKelvin = 1 / (0.001129148 + (0.000234125 * logRes) + (0.0000000876741 * math.pow(logRes, 3))) // magical numbers, yay!!
       val tempCelsius = tempKelvin - 273.15
-      tempCelsius
+      val roundedValue = (math rint tempCelsius * 100) / 100
+      roundedValue
     } else {
       -1
     }
