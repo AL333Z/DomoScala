@@ -181,3 +181,8 @@ The interaction between all system components is defined in `test` folder, conta
 Every APIs is **asynchronous from the bottom up**. The system handles every request in an [asynchronous, non-blocking way](https://www.playframework.com/documentation/2.3.x/ScalaAsync). Thus, if the client request a heavy operation to the server, the client will be blocked while waiting for the response, but nothing will be blocked on the server, and server resources can be used to serve other clients.
 
 [Web Sockets](https://www.playframework.com/documentation/2.3.x/ScalaWebSockets) allows the implementation of Publish/Subscribe feature. Thus, there's a **two way full duplex communication channel** between clients and the server that enables the flow of new contents from the server to the client once the contents are produced, timely.
+
+Screenshots
+------------
+
+![front-end](docs/images/fronend-client-screenshot.png)
