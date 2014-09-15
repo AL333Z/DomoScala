@@ -9,7 +9,7 @@ $(function() {
 		    	{{#devices}}	\
 				<li class='list-group-item' id='{{deviceId}}-li'>	\
 			    	<span class='badge' id='{{deviceId}}'>{{status}}</span>	\
-			    	{{deviceId}}	\
+			    	<img src='{{img}}' alt='' height='36' width='36'> {{deviceId}}	\
 			   </li>\
 			   {{/devices}}\
 			</ul>\
@@ -35,9 +35,21 @@ $(function() {
 							console.log("		Device: " + deviceIdx + " actor: "
 									+ device);
 
+							var devIcon = "";
+							if (device.devType == "bulb") {
+								devIcon = "ic_lamp.png";
+							} else if (device.devType == "light") {
+								devIcon = "ic_light.png";
+							} else if (device.devType == "button") {
+								devIcon = "ic_switch.png";
+							} else if (device.devType == "temp") {
+								devIcon = "ic_temp.png";
+							}
+
 							var d = {};
 							d["deviceId"] = device.id;
 							d["device"] = device.devType;
+							d["img"] = '/assets/images/' + devIcon;
 
 							// TODO put here initial status
 							d["status"] = "";
